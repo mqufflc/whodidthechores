@@ -2,50 +2,61 @@ package repository
 
 import (
 	"context"
-	"os"
+	"log"
 	"testing"
-	"time"
 
+	"github.com/mqufflc/whodidthechores/internal/testhelpers"
 	"github.com/stretchr/testify/assert"
-	"github.com/testcontainers/testcontainers-go"
-	"github.com/testcontainers/testcontainers-go/modules/postgres"
-	"github.com/testcontainers/testcontainers-go/wait"
+	"github.com/stretchr/testify/suite"
 )
 
-func TestMain(m *testing.M) {
-	os.Exit(m.Run())
+type ChoreRepoTestSuite struct {
+	suite.Suite
+	pgContainer       *testhelpers.PostgresContainer
+	repositoryService *Service
+	ctx               context.Context
 }
 
-func TestChoreRepository(t *testing.T) {
-	ctx := context.Background()
+func TestChoreRepoTestSuit(t *testing.T) {
+	suite.Run(t, new(ChoreRepoTestSuite))
+}
 
-	pgContainer, err := postgres.RunContainer(ctx, testcontainers.WithImage("postgres:15.3-alpine"), postgres.WithDatabase("whodidthechores"), postgres.WithUsername("postgres"), postgres.WithPassword("postgres"), testcontainers.WithWaitStrategy((wait.ForLog("database system is ready to accept connections").
-		WithOccurrence(2).WithStartupTimeout(5 * time.Second))))
+func (suite *ChoreRepoTestSuite) SetupSuite() {
+	suite.ctx = context.Background()
+
+	pgContainer, err := testhelpers.CreatePostgesContainer(suite.ctx)
 	if err != nil {
-		t.Fatal(err)
+		log.Fatal(err)
+	}
+	suite.pgContainer = pgContainer
+
+	repositoryService, err := NewService(suite.pgContainer.ConnectionString)
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	t.Cleanup(func() {
-		if err := pgContainer.Terminate(ctx); err != nil {
-			t.Fatalf("failed to terminate pgContainer: %s", err)
-		}
-	})
+	err = repositoryService.Migrate()
+	if err != nil {
+		log.Fatalf("error during database migration : %s", err)
+	}
+	suite.repositoryService = repositoryService
+}
 
-	connStr, err := pgContainer.ConnectionString(ctx, "sslmode=disable")
-	assert.NoError(t, err)
+func (suite *ChoreRepoTestSuite) TearDownSuite() {
+	if err := suite.pgContainer.Terminate(suite.ctx); err != nil {
+		log.Fatalf("error terminating postgres container : %s", err)
+	}
+}
 
-	choreRepo, err := NewService(connStr)
-	assert.NoError(t, err)
+func (suite *ChoreRepoTestSuite) TestCreateChore() {
+	t := suite.T()
 
-	err = choreRepo.Migrate()
-	assert.NoError(t, err)
-
-	c, err := choreRepo.CreateChore(Chore{
+	customer, err := suite.repositoryService.CreateChore(Chore{
 		ID:          "ikhsyetd64",
 		Name:        "Vaisselle",
 		Description: "Faire la vaisselle",
 	})
 
 	assert.NoError(t, err)
-	assert.NotNil(t, c)
+	assert.NotNil(t, customer)
 }
