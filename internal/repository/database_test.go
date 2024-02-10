@@ -51,12 +51,97 @@ func (suite *ChoreRepoTestSuite) TearDownSuite() {
 func (suite *ChoreRepoTestSuite) TestCreateChore() {
 	t := suite.T()
 
-	customer, err := suite.repositoryService.CreateChore(Chore{
+	chore, err := suite.repositoryService.CreateChore(Chore{
 		ID:          "ikhsyetd64",
-		Name:        "Vaisselle",
-		Description: "Faire la vaisselle",
+		Name:        "Dishes",
+		Description: "Wahing dishes",
 	})
 
 	assert.NoError(t, err)
-	assert.NotNil(t, customer)
+	assert.NotNil(t, chore)
+
+	_, err = suite.repositoryService.CreateChore(Chore{
+		ID:          "ikhsyetd64",
+		Name:        "Dishes cloned",
+		Description: "Wahing dishes",
+	})
+
+	assert.ErrorContains(t, err, "chore already exists")
+
+	_, err = suite.repositoryService.CreateChore(Chore{
+		ID:          "ikhfyetd64",
+		Name:        "Dishes",
+		Description: "Wahing dishes",
+	})
+
+	assert.ErrorContains(t, err, "chore already exists")
+
+	_, err = suite.repositoryService.CreateChore(Chore{
+		ID:          "",
+		Name:        "Dishes",
+		Description: "Wahing dishes",
+	})
+
+	assert.ErrorContains(t, err, "invalid chore ID")
+
+	_, err = suite.repositoryService.CreateChore(Chore{
+		ID:          "ikhdyetd64",
+		Name:        "",
+		Description: "Wahing dishes",
+	})
+
+	assert.ErrorContains(t, err, "invalid chore name")
+}
+
+func (suite *ChoreRepoTestSuite) TestGetChore() {
+	t := suite.T()
+
+	chore, err := suite.repositoryService.CreateChore(Chore{
+		ID:          "ikhspetd64",
+		Name:        "Dishes2",
+		Description: "Washing dishes a second time",
+	})
+
+	assert.NoError(t, err)
+	assert.NotNil(t, chore)
+
+	getChore, err := suite.repositoryService.GetChore("ikhspetd64")
+	assert.NoError(t, err)
+	assert.Equal(t, chore.ID, getChore.ID)
+	assert.Equal(t, chore.Name, getChore.Name)
+	assert.Equal(t, chore.Description, getChore.Description)
+
+	emptyChore, err := suite.repositoryService.GetChore("lopddddddd")
+
+	assert.NoError(t, err)
+	assert.Nil(t, emptyChore)
+}
+
+func (suite *ChoreRepoTestSuite) TestUpdateChore() {
+	t := suite.T()
+
+	chore, err := suite.repositoryService.CreateChore(Chore{
+		ID:          "ikhsperd64",
+		Name:        "Dishes3",
+		Description: "Washing dishes a third time",
+	})
+
+	assert.NoError(t, err)
+	assert.NotNil(t, chore)
+
+	updatedChore := Chore{
+		Name:        "Dishes4",
+		Description: "Washing dishes a fourth time",
+	}
+
+	storedUpdatedChore, err := suite.repositoryService.UpdateChore("ikhsperd64", updatedChore)
+
+	assert.NoError(t, err)
+	assert.Equal(t, chore.ID, storedUpdatedChore.ID)
+	assert.Equal(t, updatedChore.Name, storedUpdatedChore.Name)
+	assert.Equal(t, updatedChore.Description, storedUpdatedChore.Description)
+	assert.NotEqual(t, chore.Name, storedUpdatedChore.Name)
+	assert.NotEqual(t, chore.Description, storedUpdatedChore.Description)
+	assert.NotEqual(t, chore.ModifiedAt, storedUpdatedChore.ModifiedAt)
+	assert.Equal(t, chore.CreatedAt, storedUpdatedChore.CreatedAt)
 }

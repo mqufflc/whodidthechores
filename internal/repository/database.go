@@ -10,7 +10,7 @@ import (
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 
 	_ "github.com/golang-migrate/migrate/v4/source/file"
-	_ "github.com/lib/pq"
+	"github.com/lib/pq"
 )
 
 type Service struct {
@@ -53,7 +53,27 @@ func (db *Service) Migrate() error {
 	return nil
 }
 
-func (db *Service) GetChore(id int) (*Chore, error) {
+func chorePgError(err error) error {
+	var pgErr *pq.Error
+	if !errors.As(err, &pgErr) {
+		return nil
+	}
+	if pgErr.Code.Name() == "unique_violation" {
+		return errors.New("chore already exists")
+	}
+	if pgErr.Code.Name() == "check_violation" {
+		switch pgErr.Constraint {
+		case "chores_id_check":
+			return errors.New("invalid chore ID")
+		case "chores_name_check":
+			return errors.New("invalid chore name")
+		}
+	}
+	fmt.Printf("%v", pgErr.Code.Name())
+	return err
+}
+
+func (db *Service) GetChore(id string) (*Chore, error) {
 	chore := Chore{}
 
 	query, err := db.db.Prepare("SELECT id, name, description FROM chores WHERE id = $1;")
@@ -66,7 +86,7 @@ func (db *Service) GetChore(id int) (*Chore, error) {
 
 	if sqlErr != nil {
 		if sqlErr == sql.ErrNoRows {
-			return &chore, nil
+			return nil, nil
 		}
 		return &chore, sqlErr
 	}
@@ -92,6 +112,9 @@ func (db *Service) CreateChore(chore Chore) (*Chore, error) {
 	err = query.QueryRow(chore.ID, chore.Name, chore.Description).Scan(&createdChore.ID, &createdChore.Name, &createdChore.Description, &createdChore.CreatedAt, &createdChore.ModifiedAt)
 
 	if err != nil {
+		if sqlErr := chorePgError(err); err != nil {
+			return &createdChore, sqlErr
+		}
 		return &createdChore, err
 	}
 
@@ -135,7 +158,7 @@ func (db *Service) ListChores() (*[]Chore, error) {
 	return &chores, nil
 }
 
-func (db *Service) UpdateChore(id int, updatedChore Chore) (*Chore, error) {
+func (db *Service) UpdateChore(id string, updatedChore Chore) (*Chore, error) {
 
 	chore := Chore{}
 
@@ -147,13 +170,13 @@ func (db *Service) UpdateChore(id int, updatedChore Chore) (*Chore, error) {
 
 	defer tx.Rollback()
 
-	query, err := tx.Prepare("UPDATE chores SET name = $2, description = $3 WHERE id = $1 RETURNING id, name, description")
+	query, err := tx.Prepare("UPDATE chores SET name = $2, description = $3, modified_at = NOW() WHERE id = $1 RETURNING id, name, description, created_at, modified_at")
 
 	if err != nil {
 		return &chore, err
 	}
 
-	sqlErr := query.QueryRow(id, updatedChore.Name, updatedChore.Description).Scan(&chore.ID, &chore.Name, &chore.Description)
+	sqlErr := query.QueryRow(id, updatedChore.Name, updatedChore.Description).Scan(&chore.ID, &chore.Name, &chore.Description, &chore.CreatedAt, &chore.ModifiedAt)
 
 	if sqlErr != nil {
 		return &chore, sqlErr
@@ -168,7 +191,7 @@ func (db *Service) UpdateChore(id int, updatedChore Chore) (*Chore, error) {
 	return &chore, nil
 }
 
-func (db *Service) DeleteChore(id int) (bool, error) {
+func (db *Service) DeleteChore(id string) (bool, error) {
 	tx, err := db.db.Begin()
 
 	if err != nil {
