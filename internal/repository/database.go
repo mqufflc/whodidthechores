@@ -33,8 +33,8 @@ func NewService(connStr string) (*Service, error) {
 	return &Service{db: db}, nil
 }
 
-func (db *Service) Migrate() error {
-	driver, err := postgres.WithInstance(db.db, &postgres.Config{})
+func (service *Service) Migrate() error {
+	driver, err := postgres.WithInstance(service.db, &postgres.Config{})
 	if err != nil {
 		return err
 	}
@@ -73,10 +73,10 @@ func chorePgError(err error) error {
 	return err
 }
 
-func (db *Service) GetChore(id string) (*Chore, error) {
+func (service *Service) GetChore(id string) (*Chore, error) {
 	chore := Chore{}
 
-	query, err := db.db.Prepare("SELECT id, name, description FROM chores WHERE id = $1;")
+	query, err := service.db.Prepare("SELECT id, name, description FROM chores WHERE id = $1")
 
 	if err != nil {
 		return &chore, err
@@ -94,22 +94,22 @@ func (db *Service) GetChore(id string) (*Chore, error) {
 	return &chore, nil
 }
 
-func (db *Service) CreateChore(chore Chore) (*Chore, error) {
+func (service *Service) CreateChore(params ChoreParams) (*Chore, error) {
 	var createdChore Chore
 
-	tx, err := db.db.Begin()
+	tx, err := service.db.Begin()
 	if err != nil {
 		return &createdChore, err
 	}
 	defer tx.Rollback()
 
-	query, err := tx.Prepare("INSERT INTO chores (id, name, description) VALUES ($1, $2, $3) RETURNING id, name, description, created_at, modified_at;")
+	query, err := tx.Prepare("INSERT INTO chores (id, name, description) VALUES ($1, $2, $3) RETURNING id, name, description, created_at, modified_at")
 
 	if err != nil {
 		return &createdChore, err
 	}
 
-	err = query.QueryRow(chore.ID, chore.Name, chore.Description).Scan(&createdChore.ID, &createdChore.Name, &createdChore.Description, &createdChore.CreatedAt, &createdChore.ModifiedAt)
+	err = query.QueryRow(params.ID, params.Name, params.Description).Scan(&createdChore.ID, &createdChore.Name, &createdChore.Description, &createdChore.CreatedAt, &createdChore.ModifiedAt)
 
 	if err != nil {
 		if sqlErr := chorePgError(err); err != nil {
@@ -127,8 +127,8 @@ func (db *Service) CreateChore(chore Chore) (*Chore, error) {
 	return &createdChore, nil
 }
 
-func (db *Service) ListChores() (*[]Chore, error) {
-	rows, err := db.db.Query("SELECT id, name, description FROM chores;")
+func (service *Service) ListChores() (*[]Chore, error) {
+	rows, err := service.db.Query("SELECT id, name, description FROM chores")
 
 	if err != nil {
 		return nil, err
@@ -158,11 +158,11 @@ func (db *Service) ListChores() (*[]Chore, error) {
 	return &chores, nil
 }
 
-func (db *Service) UpdateChore(id string, updatedChore Chore) (*Chore, error) {
+func (service *Service) UpdateChore(params ChoreParams) (*Chore, error) {
 
 	chore := Chore{}
 
-	tx, err := db.db.Begin()
+	tx, err := service.db.Begin()
 
 	if err != nil {
 		return &chore, err
@@ -170,13 +170,13 @@ func (db *Service) UpdateChore(id string, updatedChore Chore) (*Chore, error) {
 
 	defer tx.Rollback()
 
-	query, err := tx.Prepare("UPDATE chores SET name = $2, description = $3, modified_at = NOW() WHERE id = $1 RETURNING id, name, description, created_at, modified_at")
+	query, err := tx.Prepare(`UPDATE chores SET name = COALESCE($2, name), description = COALESCE($3, description), modified_at = NOW() WHERE id = $1 RETURNING id, name, description, created_at, modified_at`)
 
 	if err != nil {
 		return &chore, err
 	}
 
-	sqlErr := query.QueryRow(id, updatedChore.Name, updatedChore.Description).Scan(&chore.ID, &chore.Name, &chore.Description, &chore.CreatedAt, &chore.ModifiedAt)
+	sqlErr := query.QueryRow(params.ID, params.Name, params.Description).Scan(&chore.ID, &chore.Name, &chore.Description, &chore.CreatedAt, &chore.ModifiedAt)
 
 	if sqlErr != nil {
 		return &chore, sqlErr
@@ -191,8 +191,8 @@ func (db *Service) UpdateChore(id string, updatedChore Chore) (*Chore, error) {
 	return &chore, nil
 }
 
-func (db *Service) DeleteChore(id string) (bool, error) {
-	tx, err := db.db.Begin()
+func (service *Service) DeleteChore(id string) (bool, error) {
+	tx, err := service.db.Begin()
 
 	if err != nil {
 		return false, err

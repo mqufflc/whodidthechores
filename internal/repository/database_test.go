@@ -51,7 +51,7 @@ func (suite *ChoreRepoTestSuite) TearDownSuite() {
 func (suite *ChoreRepoTestSuite) TestCreateChore() {
 	t := suite.T()
 
-	chore, err := suite.repositoryService.CreateChore(Chore{
+	chore, err := suite.repositoryService.CreateChore(ChoreParams{
 		ID:          "ikhsyetd64",
 		Name:        "Dishes",
 		Description: "Wahing dishes",
@@ -60,7 +60,7 @@ func (suite *ChoreRepoTestSuite) TestCreateChore() {
 	assert.NoError(t, err)
 	assert.NotNil(t, chore)
 
-	_, err = suite.repositoryService.CreateChore(Chore{
+	_, err = suite.repositoryService.CreateChore(ChoreParams{
 		ID:          "ikhsyetd64",
 		Name:        "Dishes cloned",
 		Description: "Wahing dishes",
@@ -68,7 +68,7 @@ func (suite *ChoreRepoTestSuite) TestCreateChore() {
 
 	assert.ErrorContains(t, err, "chore already exists")
 
-	_, err = suite.repositoryService.CreateChore(Chore{
+	_, err = suite.repositoryService.CreateChore(ChoreParams{
 		ID:          "ikhfyetd64",
 		Name:        "Dishes",
 		Description: "Wahing dishes",
@@ -76,7 +76,7 @@ func (suite *ChoreRepoTestSuite) TestCreateChore() {
 
 	assert.ErrorContains(t, err, "chore already exists")
 
-	_, err = suite.repositoryService.CreateChore(Chore{
+	_, err = suite.repositoryService.CreateChore(ChoreParams{
 		ID:          "",
 		Name:        "Dishes",
 		Description: "Wahing dishes",
@@ -84,7 +84,7 @@ func (suite *ChoreRepoTestSuite) TestCreateChore() {
 
 	assert.ErrorContains(t, err, "invalid chore ID")
 
-	_, err = suite.repositoryService.CreateChore(Chore{
+	_, err = suite.repositoryService.CreateChore(ChoreParams{
 		ID:          "ikhdyetd64",
 		Name:        "",
 		Description: "Wahing dishes",
@@ -96,7 +96,7 @@ func (suite *ChoreRepoTestSuite) TestCreateChore() {
 func (suite *ChoreRepoTestSuite) TestGetChore() {
 	t := suite.T()
 
-	chore, err := suite.repositoryService.CreateChore(Chore{
+	chore, err := suite.repositoryService.CreateChore(ChoreParams{
 		ID:          "ikhspetd64",
 		Name:        "Dishes2",
 		Description: "Washing dishes a second time",
@@ -120,7 +120,7 @@ func (suite *ChoreRepoTestSuite) TestGetChore() {
 func (suite *ChoreRepoTestSuite) TestUpdateChore() {
 	t := suite.T()
 
-	chore, err := suite.repositoryService.CreateChore(Chore{
+	chore, err := suite.repositoryService.CreateChore(ChoreParams{
 		ID:          "ikhsperd64",
 		Name:        "Dishes3",
 		Description: "Washing dishes a third time",
@@ -129,13 +129,13 @@ func (suite *ChoreRepoTestSuite) TestUpdateChore() {
 	assert.NoError(t, err)
 	assert.NotNil(t, chore)
 
-	updatedChore := Chore{
+	updatedChore := ChoreParams{
+		ID:          "ikhsperd64",
 		Name:        "Dishes4",
 		Description: "Washing dishes a fourth time",
 	}
 
-	storedUpdatedChore, err := suite.repositoryService.UpdateChore("ikhsperd64", updatedChore)
-
+	storedUpdatedChore, err := suite.repositoryService.UpdateChore(updatedChore)
 	assert.NoError(t, err)
 	assert.Equal(t, chore.ID, storedUpdatedChore.ID)
 	assert.Equal(t, updatedChore.Name, storedUpdatedChore.Name)
