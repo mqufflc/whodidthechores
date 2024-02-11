@@ -20,7 +20,7 @@ templ layout() {
 templ choresTemplate(chores []repository.Chore) {
     <div id="choresList">
         for _, chore := range chores {
-            <div id="chore-{ chore.ID }">
+            <div id={ "chore-" + chore.ID}>
                 Name: <span>{ chore.Name }</span>
                 Description: <span>{ chore.Description }</span>
             </div>
