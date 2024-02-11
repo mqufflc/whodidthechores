@@ -7,28 +7,38 @@ import (
 	"github.com/mqufflc/whodidthechores/internal/repository"
 )
 
-type DefaultHandler struct {
+type HTTPServerAPI struct {
 	Repository *repository.Service
 }
 
-func New(repo *repository.Service) *DefaultHandler {
-	return &DefaultHandler{
+func New(repo *repository.Service) http.Handler {
+	s := &HTTPServerAPI{
 		Repository: repo,
 	}
+	mux := http.NewServeMux()
+	mux.HandleFunc("/{$}", s.index)
+	mux.HandleFunc("/chores/{$}", s.chores)
+	mux.HandleFunc("/", s.notFound)
+	return mux
 }
 
-func (h *DefaultHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	h.Get(w, r)
+func (h *HTTPServerAPI) index(w http.ResponseWriter, r *http.Request) {
+	components.Index().Render(r.Context(), w)
 }
 
-func (h *DefaultHandler) Get(w http.ResponseWriter, r *http.Request) {
-	h.View(w, r)
+func (h *HTTPServerAPI) chores(w http.ResponseWriter, r *http.Request) {
+	h.viewChores(w, r)
 }
 
-func (h *DefaultHandler) View(w http.ResponseWriter, r *http.Request) {
+func (h *HTTPServerAPI) viewChores(w http.ResponseWriter, r *http.Request) {
 	chores, err := h.Repository.ListChores()
 	if err != nil {
 		w.WriteHeader(500)
 	}
 	components.Chores(*chores).Render(r.Context(), w)
+}
+
+func (h *HTTPServerAPI) notFound(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(404)
+	components.NotFound().Render(r.Context(), w)
 }

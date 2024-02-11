@@ -20,8 +20,11 @@ func main() {
 	}
 	defaultHandler := api.New(service)
 
-	http.Handle("/", defaultHandler)
+	http := &http.Server{
+		Addr:    ":3000",
+		Handler: defaultHandler,
+	}
 
 	fmt.Println("Listening on :3000")
-	http.ListenAndServe(":3000", nil)
+	http.ListenAndServe()
 }

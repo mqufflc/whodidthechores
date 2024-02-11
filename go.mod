@@ -1,6 +1,6 @@
 module github.com/mqufflc/whodidthechores
 
-go 1.21.5
+go 1.22.0
 
 require (
 	github.com/a-h/templ v0.2.543
@@ -61,5 +61,3 @@ require (
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace github.com/mqufflc/whodidthechores/internal/repository => ./repository
