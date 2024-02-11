@@ -3,6 +3,7 @@ module github.com/mqufflc/whodidthechores
 go 1.21.5
 
 require (
+	github.com/a-h/templ v0.2.543
 	github.com/golang-migrate/migrate/v4 v4.17.0
 	github.com/lib/pq v1.10.9
 	github.com/stretchr/testify v1.8.4
