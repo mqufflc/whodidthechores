@@ -20,7 +20,7 @@ templ layout(title string) {
             <meta name="viewport" content="width=device-width, initial-scale=1"/>
             <script src="https://unpkg.com/htmx.org/dist/htmx.min.js"></script>
         </head>
-        <body>
+        <body hx-boost="true">
             @navTemplate()
            { children... }
         </body>
@@ -54,5 +54,31 @@ templ choresTemplate(chores []repository.Chore) {
 templ Chores(chores []repository.Chore) {
     @layout("Chores") {
         @choresTemplate(chores)
+        <p>
+            <a href="/chores/new">Add Chore</a>
+        </p>
+    }
+}
+
+templ ChoreCreate() {
+    @layout("Create a new Chore") {
+        <form action="/chores/" method="post">
+            <fieldset>
+                <legend>Chore Values</legend>
+                <p>
+                    <label for="name">Name</label>
+                    <input name="name" id="name" type="text" placeholder="Dishes"/>
+                </p>
+                <p>
+                    <label for="description">Description</label>
+                    <input name="description" id="description" type="text" placeholder="Washing the dishes"/>
+                </p>
+                <button>Save</button>
+            </fieldset>
+        </form>
+
+        <p>
+            <a href="/chores">Back</a>
+        </p>
     }
 }
