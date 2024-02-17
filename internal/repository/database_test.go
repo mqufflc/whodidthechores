@@ -35,7 +35,7 @@ func (suite *ChoreRepoTestSuite) SetupSuite() {
 		log.Fatal(err)
 	}
 
-	err = repositoryService.Migrate()
+	err = repositoryService.Migrate("../../migrations")
 	if err != nil {
 		log.Fatalf("error during database migration : %s", err)
 	}

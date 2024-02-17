@@ -8,6 +8,7 @@ import (
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
+	"github.com/mqufflc/whodidthechores/internal/auth"
 
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/lib/pq"
@@ -33,12 +34,12 @@ func NewService(connStr string) (*Service, error) {
 	return &Service{db: db}, nil
 }
 
-func (service *Service) Migrate() error {
+func (service *Service) Migrate(migration_file_path string) error {
 	driver, err := postgres.WithInstance(service.db, &postgres.Config{})
 	if err != nil {
 		return err
 	}
-	m, err := migrate.NewWithDatabaseInstance("file://migrations", "postgres", driver)
+	m, err := migrate.NewWithDatabaseInstance("file://"+migration_file_path, "postgres", driver)
 	if err != nil {
 		return err
 	}
@@ -51,6 +52,86 @@ func (service *Service) Migrate() error {
 		}
 	}
 	return nil
+}
+
+func userPgError(err error) error {
+	var pgErr *pq.Error
+	if !errors.As(err, &pgErr) {
+		return nil
+	}
+	if pgErr.Code.Name() == "unique_violation" {
+		return errors.New("user already exists")
+	}
+	if pgErr.Code.Name() == "check_violation" {
+		switch pgErr.Constraint {
+		case "users_id_check":
+			return errors.New("invalid user ID")
+		case "users_name_check":
+			return errors.New("invalid user name")
+		}
+	}
+	fmt.Printf("%v", pgErr.Code.Name())
+	return err
+}
+
+func (service *Service) CreateUser(params UserParams) (*User, error) {
+	var createdUser User
+
+	hash, err := auth.HashPassword(params.Password)
+
+	if err != nil {
+		return &createdUser, errors.New("unable to generate password hash")
+	}
+
+	tx, err := service.db.Begin()
+	if err != nil {
+		return &createdUser, err
+	}
+	defer tx.Rollback()
+
+	query, err := tx.Prepare("INSERT INTO users (id, name, hash) VALUES ($1, $2, $3) RETURNING id, name, hash, created_at, modified_at")
+
+	if err != nil {
+		return &createdUser, err
+	}
+
+	err = query.QueryRow(params.ID, params.Name, hash).Scan(&createdUser.ID, &createdUser.Name, &createdUser.CreatedAt, &createdUser.ModifiedAt)
+
+	if err != nil {
+		if sqlErr := userPgError(err); err != nil {
+			return &createdUser, sqlErr
+		}
+		return &createdUser, err
+	}
+
+	err = tx.Commit()
+
+	if err != nil {
+		return &createdUser, err
+	}
+
+	return &createdUser, nil
+}
+
+func (service *Service) GetUser(id string) (*User, error) {
+	User := User{}
+
+	query, err := service.db.Prepare("SELECT id, name, hash FROM users WHERE id = $1")
+
+	if err != nil {
+		return &User, err
+	}
+
+	sqlErr := query.QueryRow(id).Scan(&User.ID, &User.Name, &User.Hash)
+
+	if sqlErr != nil {
+		if sqlErr == sql.ErrNoRows {
+			return nil, nil
+		}
+		return &User, sqlErr
+	}
+
+	return &User, nil
 }
 
 func chorePgError(err error) error {

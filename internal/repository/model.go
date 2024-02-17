@@ -10,6 +10,33 @@ func (e ValidationError) Error() string {
 	return e.s
 }
 
+type User struct {
+	ID         string
+	Name       string
+	Hash       string
+	CreatedAt  time.Time
+	ModifiedAt time.Time
+}
+
+type UserParams struct {
+	ID       string
+	Name     string
+	Password string
+}
+
+type Session struct {
+	ID         string
+	User       *User
+	CreatedAt  time.Time
+	LastUsedAt time.Time
+	ExpiresAt  time.Time
+}
+
+type Credentials struct {
+	Name     string
+	Password string // either the password or the hash
+}
+
 type Chore struct {
 	ID          string `json:"id"`
 	Name        string `json:"name"`
