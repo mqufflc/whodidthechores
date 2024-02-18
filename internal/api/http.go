@@ -1,6 +1,7 @@
 package api
 
 import (
+	"log/slog"
 	"net/http"
 
 	"github.com/mqufflc/whodidthechores/internal/components"
@@ -18,14 +19,54 @@ func New(repo *repository.Service) http.Handler {
 	}
 	mux := http.NewServeMux()
 	mux.HandleFunc("/{$}", s.index)
-	mux.HandleFunc("/chores/{$}", s.chores)
-	mux.HandleFunc("/chores/new/{$}", s.createChoreForm)
+	mux.HandleFunc("/login", s.login)
+	mux.HandleFunc("/signup", s.signup)
+	mux.HandleFunc("/chores", s.chores)
+	mux.HandleFunc("/chores/new", s.createChoreForm)
 	mux.HandleFunc("/", s.notFound)
 	return mux
 }
 
 func (h *HTTPServerAPI) index(w http.ResponseWriter, r *http.Request) {
 	components.Index().Render(r.Context(), w)
+}
+
+func (h *HTTPServerAPI) login(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		slog.Info("Received POST on /login")
+		if err := r.ParseForm(); err != nil {
+			w.WriteHeader(500)
+			return
+		}
+		session, err := h.Repository.Login(repository.Credentials{Name: r.FormValue("username"), Password: r.FormValue("password")})
+		if err != nil {
+			w.WriteHeader(500)
+			return
+		}
+		http.SetCookie(w, &http.Cookie{Name: "session", Value: session.ID, HttpOnly: true, Expires: session.ExpiresAt})
+		http.Redirect(w, r, "/", http.StatusFound)
+	}
+	components.Login().Render(r.Context(), w)
+}
+
+func (h *HTTPServerAPI) signup(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		slog.Info("Received POST on /signup")
+		if err := r.ParseForm(); err != nil {
+			w.WriteHeader(500)
+			slog.Error("Error while parsing form values : %w", err)
+			return
+		}
+		session, err := h.Repository.SignUp(repository.Credentials{Name: r.FormValue("username"), Password: r.FormValue("password")})
+		if err != nil {
+			w.WriteHeader(500)
+			slog.Error("Error while getting session after signup : %w", err)
+			return
+		}
+		http.SetCookie(w, &http.Cookie{Name: "session", Value: session.ID, HttpOnly: true, Expires: session.ExpiresAt})
+		http.Redirect(w, r, "/", http.StatusFound)
+	}
+	components.SignUp().Render(r.Context(), w)
 }
 
 func (h *HTTPServerAPI) chores(w http.ResponseWriter, r *http.Request) {

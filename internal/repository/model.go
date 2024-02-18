@@ -19,9 +19,9 @@ type User struct {
 }
 
 type UserParams struct {
-	ID       string
-	Name     string
-	Password string
+	ID   string
+	Name string
+	Hash string
 }
 
 type Session struct {
@@ -30,6 +30,12 @@ type Session struct {
 	CreatedAt  time.Time
 	LastUsedAt time.Time
 	ExpiresAt  time.Time
+}
+
+type SessionParams struct {
+	ID        string
+	UserID    string
+	ExpiresAt time.Time
 }
 
 type Credentials struct {

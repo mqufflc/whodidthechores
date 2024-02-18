@@ -8,7 +8,6 @@ import (
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
-	"github.com/mqufflc/whodidthechores/internal/auth"
 
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/lib/pq"
@@ -77,12 +76,6 @@ func userPgError(err error) error {
 func (service *Service) CreateUser(params UserParams) (*User, error) {
 	var createdUser User
 
-	hash, err := auth.HashPassword(params.Password)
-
-	if err != nil {
-		return &createdUser, errors.New("unable to generate password hash")
-	}
-
 	tx, err := service.db.Begin()
 	if err != nil {
 		return &createdUser, err
@@ -95,7 +88,7 @@ func (service *Service) CreateUser(params UserParams) (*User, error) {
 		return &createdUser, err
 	}
 
-	err = query.QueryRow(params.ID, params.Name, hash).Scan(&createdUser.ID, &createdUser.Name, &createdUser.CreatedAt, &createdUser.ModifiedAt)
+	err = query.QueryRow(params.ID, params.Name, params.Hash).Scan(&createdUser.ID, &createdUser.Name, &createdUser.Hash, &createdUser.CreatedAt, &createdUser.ModifiedAt)
 
 	if err != nil {
 		if sqlErr := userPgError(err); err != nil {
@@ -132,6 +125,65 @@ func (service *Service) GetUser(id string) (*User, error) {
 	}
 
 	return &User, nil
+}
+
+func (service *Service) SearchUserByName(name string) (*User, error) {
+	User := User{}
+
+	query, err := service.db.Prepare("SELECT id, name, hash FROM users WHERE name = $1")
+
+	if err != nil {
+		return &User, err
+	}
+
+	sqlErr := query.QueryRow(name).Scan(&User.ID, &User.Name, &User.Hash)
+
+	if sqlErr != nil {
+		if sqlErr == sql.ErrNoRows {
+			return nil, nil
+		}
+		return &User, sqlErr
+	}
+
+	return &User, nil
+}
+
+func (service *Service) CreateSession(params SessionParams) (*Session, error) {
+	var createdSession = Session{}
+	createdSession.User = &User{}
+
+	tx, err := service.db.Begin()
+	if err != nil {
+		return &createdSession, err
+	}
+	defer tx.Rollback()
+
+	query, err := tx.Prepare("INSERT INTO user_sessions (id, user_id, expires_at) VALUES ($1, $2, $3) RETURNING id, user_id, created_at, last_used_at, expires_at")
+
+	if err != nil {
+		return &createdSession, err
+	}
+
+	err = query.QueryRow(params.ID, params.UserID, params.ExpiresAt).Scan(&createdSession.ID, &createdSession.User.ID, &createdSession.CreatedAt, &createdSession.LastUsedAt, &createdSession.ExpiresAt)
+
+	if err != nil {
+		return &createdSession, err
+	}
+
+	err = tx.Commit()
+
+	if err != nil {
+		return &createdSession, err
+	}
+
+	user, err := service.GetUser(createdSession.User.ID)
+	if err != nil {
+		return &createdSession, errors.New("unable to get session's user")
+	}
+
+	createdSession.User = user
+
+	return &createdSession, nil
 }
 
 func chorePgError(err error) error {

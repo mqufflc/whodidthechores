@@ -6,6 +6,8 @@ templ navTemplate() {
     <nav>
 		<ul>
 			<li><a href="/">Home</a></li>
+            <li><a href="/login">Login</a></li>
+            <li><a href="/signup">Signup</a></li>
 			<li><a href="/chores">Chores</a></li>
 		</ul>
 	</nav>
@@ -25,6 +27,40 @@ templ layout(title string) {
            { children... }
         </body>
     </html>
+}
+
+templ Login() {
+    @layout("Login") {
+        <h2>Login</h2>
+        <form action="/login" method="post">
+            <p>
+                <label for="username">Username</label>
+                <input type="text" name="username" id="username" />
+            </p>
+            <p>
+                <label for="password">Password</label>
+                <input type="password" name="password" id="password" />
+            </p>
+            <button>Login</button>
+        </form>
+    }
+}
+
+templ SignUp() {
+    @layout("SignUp") {
+        <h2>Create Account</h2>
+        <form action="/signup" method="post">
+            <p>
+                <label for="username">Username</label>
+                <input type="text" name="username" id="username" />
+            </p>
+            <p>
+                <label for="password">Password</label>
+                <input type="password" name="password" id="password" />
+            </p>
+            <button>Create Account</button>
+        </form>
+    }
 }
 
 templ Index() {
@@ -62,7 +98,7 @@ templ Chores(chores []repository.Chore) {
 
 templ ChoreCreate() {
     @layout("Create a new Chore") {
-        <form action="/chores/" method="post">
+        <form action="/chores" method="post">
             <fieldset>
                 <legend>Chore Values</legend>
                 <p>

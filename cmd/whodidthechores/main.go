@@ -14,7 +14,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = service.Migrate("file://migrations")
+	err = service.Migrate("migrations")
 	if err != nil {
 		log.Fatal(err)
 	}
