@@ -8,6 +8,7 @@ import (
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
+	"github.com/google/uuid"
 
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/lib/pq"
@@ -91,7 +92,7 @@ func (service *Service) CreateUser(params UserParams) (*User, error) {
 	err = query.QueryRow(params.ID, params.Name, params.Hash).Scan(&createdUser.ID, &createdUser.Name, &createdUser.Hash, &createdUser.CreatedAt, &createdUser.ModifiedAt)
 
 	if err != nil {
-		if sqlErr := userPgError(err); err != nil {
+		if sqlErr := userPgError(err); sqlErr != nil {
 			return &createdUser, sqlErr
 		}
 		return &createdUser, err
@@ -128,24 +129,24 @@ func (service *Service) GetUser(id string) (*User, error) {
 }
 
 func (service *Service) SearchUserByName(name string) (*User, error) {
-	User := User{}
+	user := User{}
 
 	query, err := service.db.Prepare("SELECT id, name, hash FROM users WHERE name = $1")
 
 	if err != nil {
-		return &User, err
+		return &user, err
 	}
 
-	sqlErr := query.QueryRow(name).Scan(&User.ID, &User.Name, &User.Hash)
+	sqlErr := query.QueryRow(name).Scan(&user.ID, &user.Name, &user.Hash)
 
 	if sqlErr != nil {
 		if sqlErr == sql.ErrNoRows {
 			return nil, nil
 		}
-		return &User, sqlErr
+		return &user, sqlErr
 	}
 
-	return &User, nil
+	return &user, nil
 }
 
 func (service *Service) CreateSession(params SessionParams) (*Session, error) {
@@ -184,6 +185,35 @@ func (service *Service) CreateSession(params SessionParams) (*Session, error) {
 	createdSession.User = user
 
 	return &createdSession, nil
+}
+
+func (service *Service) GetSession(id uuid.UUID) (*Session, error) {
+	session := Session{}
+	session.User = &User{}
+
+	query, err := service.db.Prepare("SELECT id, user_id, created_at, last_used_at, expires_at FROM user_sessions WHERE id = $1")
+
+	if err != nil {
+		return &session, err
+	}
+
+	sqlErr := query.QueryRow(id).Scan(&session.ID, &session.User.ID, &session.CreatedAt, &session.LastUsedAt, &session.ExpiresAt)
+
+	if sqlErr != nil {
+		if sqlErr == sql.ErrNoRows {
+			return nil, nil
+		}
+		return &session, sqlErr
+	}
+
+	user, err := service.GetUser(session.User.ID)
+	if err != nil {
+		return &session, errors.New("unable to get session's user")
+	}
+
+	session.User = user
+
+	return &session, nil
 }
 
 func chorePgError(err error) error {
@@ -245,7 +275,7 @@ func (service *Service) CreateChore(params ChoreParams) (*Chore, error) {
 	err = query.QueryRow(params.ID, params.Name, params.Description).Scan(&createdChore.ID, &createdChore.Name, &createdChore.Description, &createdChore.CreatedAt, &createdChore.ModifiedAt)
 
 	if err != nil {
-		if sqlErr := chorePgError(err); err != nil {
+		if sqlErr := chorePgError(err); sqlErr != nil {
 			return &createdChore, sqlErr
 		}
 		return &createdChore, err

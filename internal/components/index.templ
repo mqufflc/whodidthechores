@@ -1,6 +1,7 @@
 package components
 
 import "github.com/mqufflc/whodidthechores/internal/repository"
+import "net/url"
 
 templ navTemplate() {
     <nav>
@@ -29,10 +30,17 @@ templ layout(title string) {
     </html>
 }
 
-templ Login() {
+func computeLoginPost(redirect string) string{
+    if redirect != "" {
+        return "/login?redirect=" + url.PathEscape(redirect)
+    }
+    return "/login"
+}
+
+templ Login(redirect string) {
     @layout("Login") {
         <h2>Login</h2>
-        <form action="/login" method="post">
+        <form action={templ.SafeURL(computeLoginPost(redirect))} method="post">
             <p>
                 <label for="username">Username</label>
                 <input type="text" name="username" id="username" />

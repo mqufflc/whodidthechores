@@ -1,6 +1,10 @@
 package repository
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type ValidationError struct {
 	s string
@@ -25,7 +29,7 @@ type UserParams struct {
 }
 
 type Session struct {
-	ID         string
+	ID         uuid.UUID
 	User       *User
 	CreatedAt  time.Time
 	LastUsedAt time.Time

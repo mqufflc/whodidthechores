@@ -100,11 +100,12 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defaultHandler := api.New(service)
+
+	handler := api.New(service)
 
 	http := &http.Server{
 		Addr:    fmt.Sprintf(":%d", config.Port),
-		Handler: defaultHandler,
+		Handler: handler,
 	}
 
 	fmt.Printf("Listening on :%d\n", config.Port)
