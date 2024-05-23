@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"slices"
 	"strings"
 
@@ -12,6 +13,17 @@ import (
 	"github.com/mqufflc/whodidthechores/internal/repository"
 	"github.com/spf13/viper"
 )
+
+const (
+	exitFail = 1
+)
+
+func main() {
+	if err := run(); err != nil {
+		fmt.Fprintf(os.Stderr, "%s\n", err)
+		os.Exit(exitFail)
+	}
+}
 
 type DbConfig struct {
 	Username string `mapstructure:"username"`
@@ -54,8 +66,7 @@ func (c Config) Validate() error {
 	return nil
 }
 
-func main() {
-
+func run() error {
 	viperInstance := viper.New()
 	viperInstance.SetConfigName("config")
 	viperInstance.AddConfigPath("/etc/whodidthechores/")
@@ -65,7 +76,7 @@ func main() {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
 			log.Println("No Config file found.")
 		} else {
-			panic(fmt.Errorf("fatal error config file: %w", err))
+			return fmt.Errorf("config file error: %w", err)
 		}
 	}
 
@@ -86,19 +97,19 @@ func main() {
 
 	err = viperInstance.Unmarshal(&config)
 	if err != nil {
-		panic(fmt.Errorf("unable to decode config into struct, %w", err))
+		return fmt.Errorf("unable to decode config into struct, %w", err)
 	}
 	if err = config.Validate(); err != nil {
-		panic(fmt.Errorf("configuration error: %w", err))
+		return fmt.Errorf("invalid config: %w", err)
 	}
 
 	service, err := repository.NewService(fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=%s", config.Database.Username, config.Database.Password, config.Database.Hostname, config.Database.Port, config.Database.Database, config.Database.SslMode))
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("unable to open a connection to the database: %w", err)
 	}
 	err = service.Migrate("migrations")
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("migration error: %w", err)
 	}
 
 	handler := api.New(service)
@@ -110,4 +121,5 @@ func main() {
 
 	fmt.Printf("Listening on :%d\n", config.Port)
 	http.ListenAndServe()
+	return nil
 }

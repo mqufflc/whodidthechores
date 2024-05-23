@@ -20,29 +20,31 @@ type AuthMiddlewareFactory struct {
 	repository *repository.Service
 }
 
-func (m *AuthMiddleware) IsAuthenticated(r *http.Request) (*repository.User, error) {
+func (m *AuthMiddleware) getSession(r *http.Request) (*repository.Session, error) {
 	cookie, err := r.Cookie("session")
 	if err != nil {
-		return &repository.User{}, err
+		return &repository.Session{}, err
 	}
 	uuid, err := uuid.Parse(cookie.Value)
 	if err != nil {
-		return &repository.User{}, err
+		return &repository.Session{}, err
 	}
 	session, err := m.repository.GetSession(uuid)
 	if err != nil {
-		return &repository.User{}, err
+		return &repository.Session{}, err
 	}
 
 	if time.Now().After(session.ExpiresAt) {
-		return &repository.User{}, err
+		return &repository.Session{}, err
 	}
 
-	return session.User, nil
+	m.repository.UseSession(session.ID)
+
+	return session, nil
 }
 
 func (authMiddleware AuthMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	user, err := authMiddleware.IsAuthenticated(r)
+	session, err := authMiddleware.getSession(r)
 	if err != nil {
 		query := ""
 		if r.URL.RawQuery != "" {
@@ -52,7 +54,7 @@ func (authMiddleware AuthMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Re
 		http.Redirect(w, r, "/login?redirect="+url.PathEscape(redirect), http.StatusTemporaryRedirect)
 		return
 	}
-	authMiddleware.handler(w, r, user)
+	authMiddleware.handler(w, r, session.User)
 }
 
 func (authMiddlewareFactory AuthMiddlewareFactory) EnsureAuth(handlerWrapped AuthenticatedHandler) *AuthMiddleware {

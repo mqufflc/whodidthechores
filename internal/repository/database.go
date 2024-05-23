@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
@@ -74,79 +75,97 @@ func userPgError(err error) error {
 	return err
 }
 
-func (service *Service) CreateUser(params UserParams) (*User, error) {
-	var createdUser User
+func (service *Service) CreateUser(params UserParams) (createdUser *User, err error) {
 
 	tx, err := service.db.Begin()
 	if err != nil {
-		return &createdUser, err
+		return createdUser, err
 	}
-	defer tx.Rollback()
+	defer func() {
+		rollbackErr := tx.Rollback()
+		if err != nil {
+			if rollbackErr != nil {
+				log.Printf("failed to rollback user creation: %v", err)
+			}
+			return
+		}
+		err = rollbackErr
+	}()
 
 	query, err := tx.Prepare("INSERT INTO users (id, name, hash) VALUES ($1, $2, $3) RETURNING id, name, hash, created_at, modified_at")
 
 	if err != nil {
-		return &createdUser, err
+		return createdUser, err
 	}
 
-	err = query.QueryRow(params.ID, params.Name, params.Hash).Scan(&createdUser.ID, &createdUser.Name, &createdUser.Hash, &createdUser.CreatedAt, &createdUser.ModifiedAt)
+	err = query.QueryRow(params.ID, params.Name, params.Hash).Scan(createdUser.ID, createdUser.Name, createdUser.Hash, createdUser.CreatedAt, createdUser.ModifiedAt)
 
 	if err != nil {
 		if sqlErr := userPgError(err); sqlErr != nil {
-			return &createdUser, sqlErr
+			return createdUser, sqlErr
 		}
-		return &createdUser, err
+		return createdUser, err
 	}
 
 	err = tx.Commit()
 
 	if err != nil {
-		return &createdUser, err
+		return createdUser, err
 	}
 
-	return &createdUser, nil
+	return createdUser, nil
 }
 
-func (service *Service) GetUser(id string) (*User, error) {
-	User := User{}
+func (service *Service) GetUser(id string) (user *User, err error) {
 
 	query, err := service.db.Prepare("SELECT id, name, hash FROM users WHERE id = $1")
 
+	defer func() {
+		if err = query.Close(); err != nil {
+			log.Printf("failed to close query: %v\n", err)
+		}
+	}()
+
 	if err != nil {
-		return &User, err
+		return user, err
 	}
 
-	sqlErr := query.QueryRow(id).Scan(&User.ID, &User.Name, &User.Hash)
+	sqlErr := query.QueryRow(id).Scan(user.ID, user.Name, user.Hash)
 
 	if sqlErr != nil {
 		if sqlErr == sql.ErrNoRows {
 			return nil, nil
 		}
-		return &User, sqlErr
+		return user, sqlErr
 	}
 
-	return &User, nil
+	return user, nil
 }
 
-func (service *Service) SearchUserByName(name string) (*User, error) {
-	user := User{}
+func (service *Service) SearchUserByName(name string) (user *User, err error) {
 
 	query, err := service.db.Prepare("SELECT id, name, hash FROM users WHERE name = $1")
 
+	defer func() {
+		if err = query.Close(); err != nil {
+			log.Printf("failed to close query: %v\n", err)
+		}
+	}()
+
 	if err != nil {
-		return &user, err
+		return user, err
 	}
 
-	sqlErr := query.QueryRow(name).Scan(&user.ID, &user.Name, &user.Hash)
+	sqlErr := query.QueryRow(name).Scan(user.ID, user.Name, user.Hash)
 
 	if sqlErr != nil {
 		if sqlErr == sql.ErrNoRows {
 			return nil, nil
 		}
-		return &user, sqlErr
+		return user, sqlErr
 	}
 
-	return &user, nil
+	return user, nil
 }
 
 func (service *Service) CreateSession(params SessionParams) (*Session, error) {
@@ -188,32 +207,60 @@ func (service *Service) CreateSession(params SessionParams) (*Session, error) {
 }
 
 func (service *Service) GetSession(id uuid.UUID) (*Session, error) {
-	session := Session{}
+	session := &Session{}
 	session.User = &User{}
 
 	query, err := service.db.Prepare("SELECT id, user_id, created_at, last_used_at, expires_at FROM user_sessions WHERE id = $1")
 
 	if err != nil {
-		return &session, err
+		return session, err
 	}
 
-	sqlErr := query.QueryRow(id).Scan(&session.ID, &session.User.ID, &session.CreatedAt, &session.LastUsedAt, &session.ExpiresAt)
+	sqlErr := query.QueryRow(id).Scan(session.ID, session.User.ID, session.CreatedAt, session.LastUsedAt, session.ExpiresAt)
 
 	if sqlErr != nil {
 		if sqlErr == sql.ErrNoRows {
 			return nil, nil
 		}
-		return &session, sqlErr
+		return session, sqlErr
 	}
 
 	user, err := service.GetUser(session.User.ID)
 	if err != nil {
-		return &session, errors.New("unable to get session's user")
+		return session, errors.New("unable to get session's user")
 	}
 
 	session.User = user
 
-	return &session, nil
+	return session, nil
+}
+
+func (service *Service) UseSession(id uuid.UUID) (*Session, error) {
+	session := &Session{}
+	query, err := service.db.Prepare("UPDATE user_sessions SET last_used_at = $2 WHERE id = $1 RETURNING id, user_id, created_at, last_used_at, expires_at")
+
+	if err != nil {
+		return session, err
+	}
+
+	sqlErr := query.QueryRow(id, time.Now()).Scan(session.ID, session.User.ID, session.CreatedAt, session.LastUsedAt, session.ExpiresAt)
+
+	if sqlErr != nil {
+		if sqlErr == sql.ErrNoRows {
+			return nil, nil
+		}
+		return session, sqlErr
+	}
+
+	user, err := service.GetUser(session.User.ID)
+	if err != nil {
+		return session, errors.New("unable to get session's user")
+	}
+
+	session.User = user
+
+	return session, nil
+
 }
 
 func chorePgError(err error) error {
