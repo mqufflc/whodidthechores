@@ -67,7 +67,7 @@ func (service *Service) SignUp(creds Credentials) (*Session, error) {
 		return &Session{}, errors.New("unable to generate password hash")
 	}
 
-	slog.Info("Credentials received : %v, %v", creds.Name, creds.Password)
+	slog.Info(fmt.Sprintf("Credentials received : %v, %v", creds.Name, creds.Password))
 
 	user, err := service.CreateUser(UserParams{ID: utils.GenerateBase58ID(10), Name: creds.Name, Hash: hash})
 	if user == nil || err != nil {

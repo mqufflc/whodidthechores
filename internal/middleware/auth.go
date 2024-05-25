@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"errors"
 	"net/http"
 	"net/url"
 	"time"
@@ -34,8 +35,12 @@ func (m *AuthMiddleware) getSession(r *http.Request) (*repository.Session, error
 		return &repository.Session{}, err
 	}
 
+	if session == nil {
+		return &repository.Session{}, errors.New("session not found")
+	}
+
 	if time.Now().After(session.ExpiresAt) {
-		return &repository.Session{}, err
+		return &repository.Session{}, errors.New("session expired")
 	}
 
 	m.repository.UseSession(session.ID)
@@ -46,11 +51,16 @@ func (m *AuthMiddleware) getSession(r *http.Request) (*repository.Session, error
 func (authMiddleware AuthMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	session, err := authMiddleware.getSession(r)
 	if err != nil {
+		if r.URL.Path == "/login" {
+			authMiddleware.handler(w, r, nil)
+			return
+		}
 		query := ""
 		if r.URL.RawQuery != "" {
 			query = "?" + r.URL.RawQuery
 		}
 		redirect := r.URL.Path + query
+		http.SetCookie(w, &http.Cookie{Name: "session", Value: "", HttpOnly: true, Expires: time.Unix(0, 0), MaxAge: -1, Secure: true, Path: "/"})
 		http.Redirect(w, r, "/login?redirect="+url.PathEscape(redirect), http.StatusTemporaryRedirect)
 		return
 	}

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"log/slog"
 	"time"
 
 	"github.com/golang-migrate/migrate/v4"
@@ -47,12 +48,15 @@ func (service *Service) Migrate(migration_file_path string) error {
 	if err := m.Up(); err != nil {
 		switch {
 		case errors.Is(err, migrate.ErrNoChange):
-			log.Println("No new migration to apply.")
+			slog.Info("No new migration to apply.")
+			return nil
 		default:
 			return err
 		}
+	} else {
+		slog.Info("Mgrations applied")
+		return nil
 	}
-	return nil
 }
 
 func userPgError(err error) error {
@@ -71,7 +75,7 @@ func userPgError(err error) error {
 			return errors.New("invalid user name")
 		}
 	}
-	fmt.Printf("%v", pgErr.Code.Name())
+	slog.Error(fmt.Sprintf("uncaught user pg error: %v", pgErr.Code.Name()))
 	return err
 }
 
@@ -145,6 +149,41 @@ func (service *Service) GetUser(id string) (user *User, err error) {
 	}
 
 	return user, nil
+}
+
+func (service *Service) ListUser(id string) (*[]User, error) {
+	rows, err := service.db.Query("SELECT id, name, hash FROM users")
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer func() {
+		if closeErr := rows.Close(); closeErr != nil {
+			log.Printf("failed to close list users query: %v\n", err)
+		}
+	}()
+
+	users := make([]User, 0)
+
+	for rows.Next() {
+		user := User{}
+		err = rows.Scan(&user.ID, &user.Name, &user.Hash)
+
+		if err != nil {
+			return nil, err
+		}
+
+		users = append(users, user)
+	}
+
+	err = rows.Err()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &users, nil
 }
 
 func (service *Service) SearchUserByName(name string) (user *User, err error) {

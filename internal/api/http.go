@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"log/slog"
 	"net/http"
 
@@ -21,11 +22,11 @@ func New(repo *repository.Service) http.Handler {
 	authMiddlewareFactory := middleware.NewAuthMiddlewareFactory(s.repository)
 	mux := http.NewServeMux()
 	mux.HandleFunc("/{$}", s.index)
-	mux.HandleFunc("/login", s.login)
+	mux.Handle("/login", authMiddlewareFactory.EnsureAuth(s.login))
 	mux.HandleFunc("/signup", s.signup)
-	mux.Handle("/chores", authMiddlewareFactory.EnsureAuth(s.chores))
-	mux.HandleFunc("/chores/new", s.createChoreForm)
 	mux.HandleFunc("/", s.notFound)
+	mux.Handle("/chores", authMiddlewareFactory.EnsureAuth(s.chores))
+	mux.Handle("/chores/new", authMiddlewareFactory.EnsureAuth(s.createChoreForm))
 	return mux
 }
 
@@ -33,7 +34,7 @@ func (h *HTTPServerAPI) index(w http.ResponseWriter, r *http.Request) {
 	components.Index().Render(r.Context(), w)
 }
 
-func (h *HTTPServerAPI) login(w http.ResponseWriter, r *http.Request) {
+func (h *HTTPServerAPI) login(w http.ResponseWriter, r *http.Request, user *repository.User) {
 	redirect := r.URL.Query().Get("redirect")
 	if r.Method == "POST" {
 		slog.Info("Received POST on /login")
@@ -48,14 +49,18 @@ func (h *HTTPServerAPI) login(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		http.SetCookie(w, &http.Cookie{Name: "session", Value: session.ID.String(), HttpOnly: true, Expires: session.ExpiresAt, Secure: true, SameSite: http.SameSiteStrictMode})
-		if redirect != "" {
-			http.Redirect(w, r, redirect, http.StatusFound)
-		} else {
+		if redirect == "" {
 			http.Redirect(w, r, "/", http.StatusFound)
+		} else {
+			http.Redirect(w, r, redirect, http.StatusFound)
 		}
 	}
-	if r.Method == "GET" {
-
+	if user != nil {
+		if redirect == "" {
+			http.Redirect(w, r, "/", http.StatusFound)
+		} else {
+			http.Redirect(w, r, redirect, http.StatusFound)
+		}
 	}
 	components.Login(redirect).Render(r.Context(), w)
 }
@@ -65,16 +70,16 @@ func (h *HTTPServerAPI) signup(w http.ResponseWriter, r *http.Request) {
 		slog.Info("Received POST on /signup")
 		if err := r.ParseForm(); err != nil {
 			w.WriteHeader(500)
-			slog.Error("Error while parsing form values : %w", err)
+			slog.Error(fmt.Sprintf("Error while parsing form values : %v", err))
 			return
 		}
 		session, err := h.repository.SignUp(repository.Credentials{Name: r.FormValue("username"), Password: r.FormValue("password")})
 		if err != nil {
 			w.WriteHeader(500)
-			slog.Error("Error while getting session after signup : %w", err)
+			slog.Error(fmt.Sprintf("Error while getting session after signup : %v", err))
 			return
 		}
-		http.SetCookie(w, &http.Cookie{Name: "session", Value: session.ID.String(), HttpOnly: true, Expires: session.ExpiresAt, Secure: false})
+		http.SetCookie(w, &http.Cookie{Name: "session", Value: session.ID.String(), HttpOnly: true, Expires: session.ExpiresAt, Secure: true, Path: "/"})
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
 	components.SignUp().Render(r.Context(), w)
@@ -108,6 +113,6 @@ func (h *HTTPServerAPI) notFound(w http.ResponseWriter, r *http.Request) {
 	components.NotFound().Render(r.Context(), w)
 }
 
-func (h *HTTPServerAPI) createChoreForm(w http.ResponseWriter, r *http.Request) {
+func (h *HTTPServerAPI) createChoreForm(w http.ResponseWriter, r *http.Request, user *repository.User) {
 	components.ChoreCreate().Render(r.Context(), w)
 }

@@ -61,15 +61,15 @@ type ChoreParams struct {
 	Description string `json:"description"`
 }
 
-func (p *ChoreParams) validate() error {
-	if p.ID == "" {
-		return ValidationError{"missing chore ID"}
-	}
-	if p.Name == "" {
-		return ValidationError{"missing chore name"}
-	}
-	return nil
-}
+// func (p *ChoreParams) validate() error {
+// 	if p.ID == "" {
+// 		return ValidationError{"missing chore ID"}
+// 	}
+// 	if p.Name == "" {
+// 		return ValidationError{"missing chore name"}
+// 	}
+// 	return nil
+// }
 
 type Task struct {
 	Id              int `json:"id"`
