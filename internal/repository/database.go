@@ -336,6 +336,53 @@ func (service *Service) UseSession(id uuid.UUID) (session *Session, err error) {
 
 }
 
+func (service *Service) UpdateSession(params SessionParams) (session *Session, err error) {
+	session = &Session{}
+	session.User = &User{}
+
+	tx, err := service.db.Begin()
+
+	if err != nil {
+		return
+	}
+
+	defer func() {
+		rollbackErr := tx.Rollback()
+		if errors.Is(rollbackErr, sql.ErrTxDone) {
+			return
+		}
+		if err != nil {
+			if rollbackErr != nil {
+				log.Printf("failed to rollback session update: %v", err)
+			}
+			return
+		}
+		err = rollbackErr
+	}()
+
+	query, err := tx.Prepare(`WITH updated_session AS (UPDATE user_sessions SET expires_at = $2 WHERE id = $1 RETURNING *) 
+		SELECT updated_session.id, updated_session.created_at, updated_session.last_used_at, updated_session.expires_at, users.id, users.name, users.hash 
+		FROM updated_session JOIN users ON updated_session.user_id = users.id WHERE updated_session.id = $1`)
+
+	if err != nil {
+		return session, err
+	}
+
+	sqlErr := query.QueryRow(params.ID, params.ExpiresAt).Scan(&session.ID, &session.CreatedAt, &session.LastUsedAt, &session.ExpiresAt, &session.User.ID, &session.User.Name, &session.User.Hash)
+
+	if sqlErr != nil {
+		return session, sqlErr
+	}
+
+	err = tx.Commit()
+
+	if err != nil {
+		return session, err
+	}
+
+	return session, nil
+}
+
 func chorePgError(err error) error {
 	var pgErr *pq.Error
 	if !errors.As(err, &pgErr) {

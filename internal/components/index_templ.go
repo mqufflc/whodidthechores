@@ -26,7 +26,7 @@ func navTemplate() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<nav><ul><li><a href=\"/\">Home</a></li><li><a href=\"/login\">Login</a></li><li><a href=\"/signup\">Signup</a></li><li><a href=\"/chores\">Chores</a></li></ul></nav>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<nav><ul><li><a href=\"/\">Home</a></li><li><a href=\"/login\">Login</a></li><li><a href=\"/signup\">Signup</a></li><li><a href=\"/chores\">Chores</a></li></ul></nav><button hx-post=\"/logout\" hx-confirm=\"Are you sure you wish to logout?\">Log Out</button>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -57,7 +57,7 @@ func layout(title string) templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/index.templ`, Line: 20, Col: 26}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/index.templ`, Line: 21, Col: 26}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -291,7 +291,7 @@ func choresTemplate(chores []repository.Chore) templ.Component {
 			var templ_7745c5c3_Var14 string
 			templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(chore.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/index.templ`, Line: 90, Col: 40}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/index.templ`, Line: 91, Col: 40}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 			if templ_7745c5c3_Err != nil {
@@ -304,7 +304,7 @@ func choresTemplate(chores []repository.Chore) templ.Component {
 			var templ_7745c5c3_Var15 string
 			templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(chore.Description)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/index.templ`, Line: 91, Col: 54}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/index.templ`, Line: 92, Col: 54}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 			if templ_7745c5c3_Err != nil {

@@ -12,6 +12,7 @@ templ navTemplate() {
 			<li><a href="/chores">Chores</a></li>
 		</ul>
 	</nav>
+    <button hx-post="/logout" hx-confirm="Are you sure you wish to logout?">Log Out</button>
 }
 
 templ layout(title string) {

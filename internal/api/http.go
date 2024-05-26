@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"time"
 
 	"github.com/mqufflc/whodidthechores/internal/components"
 	"github.com/mqufflc/whodidthechores/internal/middleware"
@@ -23,6 +24,7 @@ func New(repo *repository.Service) http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/{$}", s.index)
 	mux.Handle("/login", authMiddlewareFactory.EnsureAuth(s.login))
+	mux.Handle("/logout", authMiddlewareFactory.EnsureAuth(s.logout))
 	mux.HandleFunc("/signup", s.signup)
 	mux.HandleFunc("/", s.notFound)
 	mux.Handle("/chores", authMiddlewareFactory.EnsureAuth(s.chores))
@@ -34,7 +36,7 @@ func (h *HTTPServerAPI) index(w http.ResponseWriter, r *http.Request) {
 	components.Index().Render(r.Context(), w)
 }
 
-func (h *HTTPServerAPI) login(w http.ResponseWriter, r *http.Request, user *repository.User) {
+func (h *HTTPServerAPI) login(w http.ResponseWriter, r *http.Request, session *repository.Session) {
 	redirect := r.URL.Query().Get("redirect")
 	if r.Method == "POST" {
 		slog.Info("Received POST on /login")
@@ -44,25 +46,49 @@ func (h *HTTPServerAPI) login(w http.ResponseWriter, r *http.Request, user *repo
 		}
 		session, err := h.repository.Login(repository.Credentials{Name: r.FormValue("username"), Password: r.FormValue("password")})
 		if err != nil {
-			w.WriteHeader(200)
+			w.WriteHeader(http.StatusOK)
 			components.Login(redirect).Render(r.Context(), w)
 			return
 		}
 		http.SetCookie(w, &http.Cookie{Name: "session", Value: session.ID.String(), HttpOnly: true, Expires: session.ExpiresAt, Secure: true, SameSite: http.SameSiteStrictMode})
 		if redirect == "" {
 			http.Redirect(w, r, "/", http.StatusFound)
+			return
 		} else {
 			http.Redirect(w, r, redirect, http.StatusFound)
+			return
 		}
 	}
-	if user != nil {
-		if redirect == "" {
-			http.Redirect(w, r, "/", http.StatusFound)
-		} else {
-			http.Redirect(w, r, redirect, http.StatusFound)
+	if r.Method == "GET" {
+		if session != nil {
+			if redirect == "" {
+				http.Redirect(w, r, "/", http.StatusFound)
+				return
+			} else {
+				http.Redirect(w, r, redirect, http.StatusFound)
+				return
+			}
 		}
+		components.Login(redirect).Render(r.Context(), w)
+		return
 	}
-	components.Login(redirect).Render(r.Context(), w)
+	w.WriteHeader(http.StatusMethodNotAllowed)
+}
+
+func (h *HTTPServerAPI) logout(w http.ResponseWriter, r *http.Request, session *repository.Session) {
+	if r.Method != "POST" {
+		slog.Info(fmt.Sprintf("Received %v on /logout", r.Method))
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+	err := h.repository.Logout(session)
+	if err != nil {
+		slog.Error(fmt.Sprintf("Error while logging out a user: %v", err))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	http.SetCookie(w, &http.Cookie{Name: "session", Value: "", HttpOnly: true, Expires: time.Unix(0, 0), MaxAge: -1, Secure: true, Path: "/"})
+	w.Header().Set("HX-Redirect", "/")
 }
 
 func (h *HTTPServerAPI) signup(w http.ResponseWriter, r *http.Request) {
@@ -85,7 +111,7 @@ func (h *HTTPServerAPI) signup(w http.ResponseWriter, r *http.Request) {
 	components.SignUp().Render(r.Context(), w)
 }
 
-func (h *HTTPServerAPI) chores(w http.ResponseWriter, r *http.Request, user *repository.User) {
+func (h *HTTPServerAPI) chores(w http.ResponseWriter, r *http.Request, session *repository.Session) {
 	if r.Method == "POST" {
 		if err := r.ParseForm(); err != nil {
 			w.WriteHeader(500)
@@ -113,6 +139,6 @@ func (h *HTTPServerAPI) notFound(w http.ResponseWriter, r *http.Request) {
 	components.NotFound().Render(r.Context(), w)
 }
 
-func (h *HTTPServerAPI) createChoreForm(w http.ResponseWriter, r *http.Request, user *repository.User) {
+func (h *HTTPServerAPI) createChoreForm(w http.ResponseWriter, r *http.Request, session *repository.Session) {
 	components.ChoreCreate().Render(r.Context(), w)
 }

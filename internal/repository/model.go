@@ -37,7 +37,7 @@ type Session struct {
 }
 
 type SessionParams struct {
-	ID        string
+	ID        uuid.UUID
 	UserID    string
 	ExpiresAt time.Time
 }

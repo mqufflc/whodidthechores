@@ -31,7 +31,7 @@ func checkPasswordComplexity(password string) error {
 
 func (service *Service) createSession(user User) (*Session, error) {
 	id := uuid.New()
-	session, err := service.CreateSession(SessionParams{ID: id.String(), UserID: user.ID, ExpiresAt: time.Now().Add(time.Hour * 4)})
+	session, err := service.CreateSession(SessionParams{ID: id, UserID: user.ID, ExpiresAt: time.Now().Add(time.Hour * 4)})
 	if err != nil {
 		slog.Error("Error while creating session")
 		return session, err
@@ -52,6 +52,11 @@ func (service *Service) Login(creds Credentials) (*Session, error) {
 
 	return service.createSession(*user)
 
+}
+
+func (service *Service) Logout(session *Session) error {
+	_, err := service.UpdateSession(SessionParams{ID: session.ID, ExpiresAt: time.Now()})
+	return err
 }
 
 func (service *Service) SignUp(creds Credentials) (*Session, error) {

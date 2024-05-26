@@ -10,7 +10,7 @@ import (
 	"github.com/mqufflc/whodidthechores/internal/repository"
 )
 
-type AuthenticatedHandler func(http.ResponseWriter, *http.Request, *repository.User)
+type AuthenticatedHandler func(http.ResponseWriter, *http.Request, *repository.Session)
 
 type AuthMiddleware struct {
 	repository *repository.Service
@@ -64,7 +64,7 @@ func (authMiddleware AuthMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Re
 		http.Redirect(w, r, "/login?redirect="+url.PathEscape(redirect), http.StatusTemporaryRedirect)
 		return
 	}
-	authMiddleware.handler(w, r, session.User)
+	authMiddleware.handler(w, r, session)
 }
 
 func (authMiddlewareFactory AuthMiddlewareFactory) EnsureAuth(handlerWrapped AuthenticatedHandler) *AuthMiddleware {
