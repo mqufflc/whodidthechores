@@ -23,3 +23,5 @@ go.work
 .docker-compose
 tmp
 config.yaml
+
+.vscode

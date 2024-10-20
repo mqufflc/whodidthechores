@@ -1,0 +1,26 @@
+package html
+
+import (
+	"fmt"
+	"github.com/mqufflc/whodidthechores/internal/repository/postgres"
+)
+
+templ choresTemplate(chores []postgres.Chore) {
+	<div id="choresList">
+		for _, chore := range chores {
+			<div id={ fmt.Sprintf("chore-%d", chore.ID) }>
+				Name: <span>{ chore.Name }</span>
+				Description: <span>{ chore.Description }</span>
+			</div>
+		}
+	</div>
+}
+
+templ Chores(chores []postgres.Chore) {
+	@layout("Chores") {
+		@choresTemplate(chores)
+		<p>
+			<a href="/chores/new">Add Chore</a>
+		</p>
+	}
+}
