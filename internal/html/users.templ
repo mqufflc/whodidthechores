@@ -1,0 +1,44 @@
+package html
+
+import (
+	"fmt"
+	"github.com/mqufflc/whodidthechores/internal/repository/postgres"
+)
+
+templ usersTemplate(users []postgres.User) {
+	<div id="usersList">
+		for _, user := range users {
+			<div id={ fmt.Sprintf("user-%d", user.ID) }>
+				Name: <span>{ user.Name }</span>
+			</div>
+		}
+	</div>
+}
+
+templ Users(users []postgres.User) {
+	@layout("Users") {
+		@usersTemplate(users)
+		<p>
+			<a href="/users/new">Add User</a>
+		</p>
+	}
+}
+
+templ UserCreate() {
+	@layout("Create a new User") {
+		<form action="/users" method="post">
+			<fieldset>
+				<legend>User Values</legend>
+				<p>
+					<label for="name">Name</label>
+					<input name="name" id="name" type="text"/>
+				</p>
+				<button>Save</button>
+			</fieldset>
+		</form>
+
+		<p>
+			<a href="/users">Back</a>
+		</p>
+	}
+}

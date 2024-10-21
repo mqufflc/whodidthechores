@@ -2,6 +2,7 @@ package html
 
 import (
 	"fmt"
+	"strconv"
 	"github.com/mqufflc/whodidthechores/internal/repository/postgres"
 )
 
@@ -11,6 +12,7 @@ templ choresTemplate(chores []postgres.Chore) {
 			<div id={ fmt.Sprintf("chore-%d", chore.ID) }>
 				Name: <span>{ chore.Name }</span>
 				Description: <span>{ chore.Description }</span>
+				Default Duration: <span>{ strconv.FormatInt(int64(chore.DefaultDurationMn), 10) } mn</span>
 			</div>
 		}
 	</div>
@@ -21,6 +23,33 @@ templ Chores(chores []postgres.Chore) {
 		@choresTemplate(chores)
 		<p>
 			<a href="/chores/new">Add Chore</a>
+		</p>
+	}
+}
+
+templ ChoreCreate() {
+	@layout("Create a new Chore") {
+		<form action="/chores" method="post">
+			<fieldset>
+				<legend>Chore Values</legend>
+				<p>
+					<label for="name">Name</label>
+					<input name="name" id="name" type="text" placeholder="Dishes"/>
+				</p>
+				<p>
+					<label for="description">Description</label>
+					<input name="description" id="description" type="text" placeholder="Washing the dishes"/>
+				</p>
+				<p>
+					<label for="default_duration">Default Duration (mn)</label>
+					<input name="default_duration" id="default_duration" type="text" placeholder="15"/>
+				</p>
+				<button>Save</button>
+			</fieldset>
+		</form>
+
+		<p>
+			<a href="/chores">Back</a>
 		</p>
 	}
 }

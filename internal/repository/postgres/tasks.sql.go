@@ -18,7 +18,7 @@ INSERT INTO tasks (
 ) VALUES (
     $1, $2, $3, $4
 )
-RETURNING id, user_id, chore_id, started_at, duration_mn
+RETURNING id, user_id, chore_id, started_at, duration_mn, description
 `
 
 type CreateTaskParams struct {
@@ -42,6 +42,7 @@ func (q *Queries) CreateTask(ctx context.Context, arg CreateTaskParams) (Task, e
 		&i.ChoreID,
 		&i.StartedAt,
 		&i.DurationMn,
+		&i.Description,
 	)
 	return i, err
 }
@@ -57,7 +58,7 @@ func (q *Queries) DeleteTask(ctx context.Context, id uuid.UUID) error {
 }
 
 const getTask = `-- name: GetTask :one
-SELECT id, user_id, chore_id, started_at, duration_mn FROM tasks
+SELECT id, user_id, chore_id, started_at, duration_mn, description FROM tasks
 WHERE id = $1
 `
 
@@ -70,12 +71,13 @@ func (q *Queries) GetTask(ctx context.Context, id uuid.UUID) (Task, error) {
 		&i.ChoreID,
 		&i.StartedAt,
 		&i.DurationMn,
+		&i.Description,
 	)
 	return i, err
 }
 
 const listTasks = `-- name: ListTasks :many
-SELECT id, user_id, chore_id, started_at, duration_mn FROM tasks
+SELECT id, user_id, chore_id, started_at, duration_mn, description FROM tasks
 ORDER BY started_at
 `
 
@@ -94,6 +96,7 @@ func (q *Queries) ListTasks(ctx context.Context) ([]Task, error) {
 			&i.ChoreID,
 			&i.StartedAt,
 			&i.DurationMn,
+			&i.Description,
 		); err != nil {
 			return nil, err
 		}

@@ -18,11 +18,12 @@ type Chore struct {
 }
 
 type Task struct {
-	ID         uuid.UUID
-	UserID     int32
-	ChoreID    int32
-	StartedAt  time.Time
-	DurationMn int32
+	ID          uuid.UUID
+	UserID      int32
+	ChoreID     int32
+	StartedAt   time.Time
+	DurationMn  int32
+	Description string
 }
 
 type User struct {

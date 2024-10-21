@@ -71,3 +71,22 @@ func (q *Queries) ListUsers(ctx context.Context) ([]User, error) {
 	}
 	return items, nil
 }
+
+const updateUser = `-- name: UpdateUser :one
+UPDATE users SET 
+name = $2
+WHERE id = $1
+RETURNING id, name
+`
+
+type UpdateUserParams struct {
+	ID   int32
+	Name string
+}
+
+func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error) {
+	row := q.db.QueryRow(ctx, updateUser, arg.ID, arg.Name)
+	var i User
+	err := row.Scan(&i.ID, &i.Name)
+	return i, err
+}
