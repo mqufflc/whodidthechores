@@ -189,7 +189,7 @@ func ChoreCreate() templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<form action=\"/chores\" method=\"post\"><fieldset><legend>Chore Values</legend><p><label for=\"name\">Name</label> <input name=\"name\" id=\"name\" type=\"text\" placeholder=\"Dishes\"></p><p><label for=\"description\">Description</label> <input name=\"description\" id=\"description\" type=\"text\" placeholder=\"Washing the dishes\"></p><p><label for=\"default_duration\">Default Duration (mn)</label> <input name=\"default_duration\" id=\"default_duration\" type=\"text\" placeholder=\"15\"></p><button>Save</button></fieldset></form><p><a href=\"/chores\">Back</a></p>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<form action=\"/chores\" method=\"post\"><fieldset><legend>Chore Values</legend><p><label for=\"name\">Name</label> <input name=\"name\" id=\"name\" type=\"text\" placeholder=\"Dishes\"></p><p><label for=\"description\">Description</label> <input name=\"description\" id=\"description\" type=\"text\" placeholder=\"Washing the dishes\"></p><p><label for=\"default_duration\">Default Duration (mn)</label> <input name=\"default_duration\" id=\"default_duration\" type=\"number\" placeholder=\"15\" min=\"0\"></p><button>Save</button></fieldset></form><p><a href=\"/chores\">Back</a></p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

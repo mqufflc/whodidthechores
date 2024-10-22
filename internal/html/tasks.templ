@@ -1,0 +1,72 @@
+package html
+
+import (
+	"fmt"
+	"github.com/mqufflc/whodidthechores/internal/repository/postgres"
+	"strconv"
+)
+
+templ tasksTemplate(tasksRows []postgres.ListUsersTasksRow) {
+	<div id="tasksList">
+		for _, taskRow := range tasksRows {
+			<div id={ fmt.Sprintf("task-%x", taskRow.Task.ID) }>
+				Chore: <span>{ taskRow.Chore.Name }</span>
+				User: <span>{ taskRow.User.Name }</span>
+				Duration: <span>{ strconv.FormatInt(int64(taskRow.Task.DurationMn), 10) } mn</span>
+				Description: <span>{ taskRow.Task.Description }</span>
+				Started At: <span>{ taskRow.Task.StartedAt.Format("02/01/2006 15:04") }</span>
+			</div>
+		}
+	</div>
+}
+
+templ Tasks(tasksRows []postgres.ListUsersTasksRow) {
+	@layout("Tasks") {
+		@tasksTemplate(tasksRows)
+		<p>
+			<a href="/tasks/new">Add Task</a>
+		</p>
+	}
+}
+
+templ TaskCreate(chores []postgres.Chore, users []postgres.User) {
+	@layout("Create a new Task") {
+		<form action="/tasks" method="post">
+			<fieldset>
+				<legend>Task Values</legend>
+				<p>
+					<label for="chore-select">Chore</label>
+					<select name="chore-id" id="chore-select">
+						for _, chore := range chores {
+							<option value={ strconv.FormatInt(int64(chore.ID), 10) }>{ chore.Name }</option>
+						}
+					</select>
+				</p>
+				<p>
+					<label for="user-select">User</label>
+					<select name="user-id" id="user-select">
+						for _, user := range users {
+							<option value={ strconv.FormatInt(int64(user.ID), 10) }>{ user.Name }</option>
+						}
+					</select>
+				</p>
+				<p>
+					<label for="start-time">Start Time</label>
+					<input type="datetime-local" id="start-time" name="start-time"/>
+				</p>
+				<p>
+					<label for="description">Description</label>
+					<input name="description" id="description" type="text"/>
+				</p>
+				<p>
+					<label for="duration">Duration (mn)</label>
+					<input name="duration" id="duration" type="number" placeholder="15" min="0"/>
+				</p>
+				<button>Save</button>
+			</fieldset>
+		</form>
+		<p>
+			<a href="/tasks">Back</a>
+		</p>
+	}
+}
