@@ -4,9 +4,8 @@
 
 - [ ] Validation
 - [ ] Deletes
-- [ ] Updates
 - [ ] Styling
 - [ ] Tests
 
 ### In Progress
-- [ ] Timezone management
+- [ ] Updates

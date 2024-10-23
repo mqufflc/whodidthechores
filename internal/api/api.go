@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/mqufflc/whodidthechores/internal/config"
 	"github.com/mqufflc/whodidthechores/internal/html"
 	"github.com/mqufflc/whodidthechores/internal/repository"
 	"github.com/mqufflc/whodidthechores/internal/repository/postgres"
@@ -14,11 +15,14 @@ import (
 
 type HTTPServer struct {
 	repository *repository.Repository
+	timezone   *time.Location
 }
 
-func New(repo *repository.Repository) http.Handler {
+func New(repo *repository.Repository, conf config.Config) http.Handler {
+	location, _ := time.LoadLocation(conf.TimeZone) //timezone already validated in config
 	s := &HTTPServer{
 		repository: repo,
+		timezone:   location,
 	}
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", s.notFound)
@@ -121,7 +125,7 @@ func (h *HTTPServer) tasks(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		startedAt, err := time.Parse("2006-01-02T15:04", r.FormValue("start-time"))
+		startedAt, err := time.ParseInLocation("2006-01-02T15:04", r.FormValue("start-time"), h.timezone)
 		if err != nil {
 			slog.Error(fmt.Sprintf("Unable to parse started time: %v", err))
 			w.WriteHeader(http.StatusInternalServerError)
@@ -153,7 +157,7 @@ func (h *HTTPServer) viewTasks(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 	}
-	html.Tasks(tasks).Render(r.Context(), w)
+	html.Tasks(tasks, h.timezone).Render(r.Context(), w)
 }
 
 func (h *HTTPServer) createTask(w http.ResponseWriter, r *http.Request) {

@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"github.com/mqufflc/whodidthechores/internal/repository/postgres"
 	"strconv"
+	"time"
 )
 
-templ tasksTemplate(tasksRows []postgres.ListUsersTasksRow) {
+templ tasksTemplate(tasksRows []postgres.ListUsersTasksRow, timezone *time.Location) {
 	<div id="tasksList">
 		for _, taskRow := range tasksRows {
 			<div id={ fmt.Sprintf("task-%x", taskRow.Task.ID) }>
@@ -14,15 +15,15 @@ templ tasksTemplate(tasksRows []postgres.ListUsersTasksRow) {
 				User: <span>{ taskRow.User.Name }</span>
 				Duration: <span>{ strconv.FormatInt(int64(taskRow.Task.DurationMn), 10) } mn</span>
 				Description: <span>{ taskRow.Task.Description }</span>
-				Started At: <span>{ taskRow.Task.StartedAt.Format("02/01/2006 15:04") }</span>
+				Started At: <span>{ taskRow.Task.StartedAt.In(timezone).Format("02/01/2006 15:04") }</span>
 			</div>
 		}
 	</div>
 }
 
-templ Tasks(tasksRows []postgres.ListUsersTasksRow) {
+templ Tasks(tasksRows []postgres.ListUsersTasksRow, timezone *time.Location) {
 	@layout("Tasks") {
-		@tasksTemplate(tasksRows)
+		@tasksTemplate(tasksRows, timezone)
 		<p>
 			<a href="/tasks/new">Add Task</a>
 		</p>

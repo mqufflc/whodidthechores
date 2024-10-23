@@ -39,7 +39,7 @@ func run() error {
 
 	repo := repository.New(repository.NewRepositoryParams{DB: pool})
 
-	handler := api.New(repo)
+	handler := api.New(repo, config)
 	http := &http.Server{
 		Addr:    fmt.Sprintf(":%d", config.Port),
 		Handler: handler,
