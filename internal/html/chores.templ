@@ -2,8 +2,8 @@ package html
 
 import (
 	"fmt"
-	"strconv"
 	"github.com/mqufflc/whodidthechores/internal/repository/postgres"
+	"strconv"
 )
 
 templ choresTemplate(chores []postgres.Chore) {
@@ -13,6 +13,7 @@ templ choresTemplate(chores []postgres.Chore) {
 				Name: <span>{ chore.Name }</span>
 				Description: <span>{ chore.Description }</span>
 				Default Duration: <span>{ strconv.FormatInt(int64(chore.DefaultDurationMn), 10) } mn</span>
+			<p><a href={ templ.URL(fmt.Sprintf("/chores/%d", chore.ID)) }>Edit</a></p>
 			</div>
 		}
 	</div>
@@ -47,7 +48,30 @@ templ ChoreCreate() {
 				<button>Save</button>
 			</fieldset>
 		</form>
+		<p>
+			<a href="/chores">Back</a>
+		</p>
+	}
+}
 
+templ ChoreEdit(chore postgres.Chore) {
+	@layout("Edit a Chore") {
+		<form action={ templ.URL(fmt.Sprintf("/chores/%d", chore.ID)) } method="PUT">
+			<legend>Chore Values</legend>
+			<p>
+				<label for="name">Name</label>
+				<input name="name" id="name" type="text" placeholder={ chore.Name } value={ chore.Name }/>
+			</p>
+			<p>
+				<label for="description">Description</label>
+				<input name="description" id="description" type="text" placeholder={ chore.Description } value={ chore.Description }/>
+			</p>
+			<p>
+				<label for="default_duration">Default Duration (mn)</label>
+				<input name="default_duration" id="default_duration" type="number" placeholder={ strconv.FormatInt(int64(chore.DefaultDurationMn), 10) } value={ strconv.FormatInt(int64(chore.DefaultDurationMn), 10) } min="0"/>
+			</p>
+			<button>Save</button>
+		</form>
 		<p>
 			<a href="/chores">Back</a>
 		</p>
