@@ -10,12 +10,13 @@ import (
 templ tasksTemplate(tasksRows []postgres.ListUsersTasksRow, timezone *time.Location) {
 	<div id="tasksList">
 		for _, taskRow := range tasksRows {
-			<div id={ fmt.Sprintf("task-%x", taskRow.Task.ID) }>
+			<div id={ fmt.Sprintf("task-%v", taskRow.Task.ID.String()) }>
 				Chore: <span>{ taskRow.Chore.Name }</span>
 				User: <span>{ taskRow.User.Name }</span>
 				Duration: <span>{ strconv.FormatInt(int64(taskRow.Task.DurationMn), 10) } mn</span>
 				Description: <span>{ taskRow.Task.Description }</span>
 				Started At: <span>{ taskRow.Task.StartedAt.In(timezone).Format("02/01/2006 15:04") }</span>
+				<p><a href={ templ.URL(fmt.Sprintf("/tasks/%v", taskRow.Task.ID.String())) }>Edit</a></p>
 			</div>
 		}
 	</div>
@@ -62,6 +63,56 @@ templ TaskCreate(chores []postgres.Chore, users []postgres.User) {
 				<p>
 					<label for="duration">Duration (mn)</label>
 					<input name="duration" id="duration" type="number" placeholder="15" min="0"/>
+				</p>
+				<button>Save</button>
+			</fieldset>
+		</form>
+		<p>
+			<a href="/tasks">Back</a>
+		</p>
+	}
+}
+
+templ TaskEdit(task postgres.Task, chores []postgres.Chore, users []postgres.User, timezone *time.Location) {
+	@layout("Edit a Task") {
+		<form action={ templ.URL(fmt.Sprintf("/tasks/%v", task.ID.String())) } method="PUT">
+			<fieldset>
+				<legend>Task Values</legend>
+				<p>
+					<label for="chore-select">Chore</label>
+					<select name="chore-id" id="chore-select" value>
+						for _, chore := range chores {
+							if task.ChoreID == chore.ID {
+								<option value={ strconv.FormatInt(int64(chore.ID), 10) } selected>{ chore.Name }</option>
+							} else {
+								<option value={ strconv.FormatInt(int64(chore.ID), 10) }>{ chore.Name }</option>
+							}
+						}
+					</select>
+				</p>
+				<p>
+					<label for="user-select">User</label>
+					<select name="user-id" id="user-select">
+						for _, user := range users {
+							if task.UserID == user.ID {
+								<option value={ strconv.FormatInt(int64(user.ID), 10) } selected>{ user.Name }</option>
+							} else {
+								<option value={ strconv.FormatInt(int64(user.ID), 10) }>{ user.Name }</option>
+							}
+						}
+					</select>
+				</p>
+				<p>
+					<label for="start-time">Start Time</label>
+					<input type="datetime-local" id="start-time" name="start-time" value={ task.StartedAt.In(timezone).Format("2006-01-02T15:04") }/>
+				</p>
+				<p>
+					<label for="description">Description</label>
+					<input name="description" id="description" type="text" value={ task.Description }/>
+				</p>
+				<p>
+					<label for="duration">Duration (mn)</label>
+					<input name="duration" id="duration" type="number" placeholder="15" min="0" value={ strconv.FormatInt(int64(task.DurationMn), 10) }/>
 				</p>
 				<button>Save</button>
 			</fieldset>

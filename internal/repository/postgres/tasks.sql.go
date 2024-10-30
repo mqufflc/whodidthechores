@@ -162,6 +162,7 @@ SELECT tasks.id, tasks.user_id, tasks.chore_id, tasks.started_at, tasks.duration
 FROM tasks
 JOIN chores ON tasks.chore_id = chores.id
 JOIN users ON tasks.user_id = users.id
+ORDER BY tasks.started_at
 `
 
 type ListUsersTasksRow struct {
@@ -208,17 +209,19 @@ UPDATE tasks SET
 user_id = $2,
 chore_id = $3,
 started_at = $4,
-duration_mn = $5
+duration_mn = $5,
+description = $6
 WHERE id = $1
 RETURNING id, user_id, chore_id, started_at, duration_mn, description
 `
 
 type UpdateTaskParams struct {
-	ID         uuid.UUID
-	UserID     int32
-	ChoreID    int32
-	StartedAt  time.Time
-	DurationMn int32
+	ID          uuid.UUID
+	UserID      int32
+	ChoreID     int32
+	StartedAt   time.Time
+	DurationMn  int32
+	Description string
 }
 
 func (q *Queries) UpdateTask(ctx context.Context, arg UpdateTaskParams) (Task, error) {
@@ -228,6 +231,7 @@ func (q *Queries) UpdateTask(ctx context.Context, arg UpdateTaskParams) (Task, e
 		arg.ChoreID,
 		arg.StartedAt,
 		arg.DurationMn,
+		arg.Description,
 	)
 	var i Task
 	err := row.Scan(

@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/mqufflc/whodidthechores/internal/config"
 	"github.com/mqufflc/whodidthechores/internal/html"
 	"github.com/mqufflc/whodidthechores/internal/repository"
@@ -34,6 +35,7 @@ func New(repo *repository.Repository, conf config.Config) http.Handler {
 	mux.HandleFunc("/users/{id}", s.editUser)
 	mux.HandleFunc("/users/new", s.createUser)
 	mux.HandleFunc("/tasks", s.tasks)
+	mux.HandleFunc("/tasks/{id}", s.editTask)
 	mux.HandleFunc("/tasks/new", s.createTask)
 	return mux
 }
@@ -157,7 +159,7 @@ func (h *HTTPServer) editUser(w http.ResponseWriter, r *http.Request) {
 
 func (h *HTTPServer) tasks(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
-		slog.Info("Received POST on /users")
+		slog.Info("Received POST on /tasks")
 		if err := r.ParseForm(); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
@@ -223,4 +225,71 @@ func (h *HTTPServer) createTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	html.TaskCreate(chores, users).Render(r.Context(), w)
+}
+
+func (h *HTTPServer) editTask(w http.ResponseWriter, r *http.Request) {
+	taskID, err := uuid.Parse(r.PathValue("id"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	if r.Method == "PUT" {
+		if err := r.ParseForm(); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		choreID, err := strconv.Atoi(r.FormValue("chore-id"))
+		if err != nil {
+			slog.Error(fmt.Sprintf("Unable to parse chore id: %v", err))
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		userID, err := strconv.Atoi(r.FormValue("user-id"))
+		if err != nil {
+			slog.Error(fmt.Sprintf("Unable to parse user id: %v", err))
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		startedAt, err := time.ParseInLocation("2006-01-02T15:04", r.FormValue("start-time"), h.timezone)
+		if err != nil {
+			slog.Error(fmt.Sprintf("Unable to parse started time: %v", err))
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		duration, err := strconv.Atoi(r.FormValue("duration"))
+		if err != nil {
+			slog.Error(fmt.Sprintf("Unable to parse duration: %v", err))
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		if _, err := h.repository.UpdateTask(r.Context(), postgres.UpdateTaskParams{
+			ID:          taskID,
+			ChoreID:     int32(choreID),
+			UserID:      int32(userID),
+			StartedAt:   startedAt,
+			DurationMn:  int32(duration),
+			Description: r.FormValue("description"),
+		}); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+	}
+	task, err := h.repository.GetTask(r.Context(), taskID)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	chores, err := h.repository.ListChores(r.Context())
+	if err != nil {
+		slog.Error(fmt.Sprintf("Unable to list chores %v", err))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	users, err := h.repository.ListUsers(r.Context())
+	if err != nil {
+		slog.Error(fmt.Sprintf("Unable to list users %v", err))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	html.TaskEdit(task, chores, users, h.timezone).Render(r.Context(), w)
 }

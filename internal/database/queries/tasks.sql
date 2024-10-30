@@ -23,7 +23,8 @@ UPDATE tasks SET
 user_id = $2,
 chore_id = $3,
 started_at = $4,
-duration_mn = $5
+duration_mn = $5,
+description = $6
 WHERE id = $1
 RETURNING *;
 
@@ -38,4 +39,5 @@ WHERE users.id = $1;
 SELECT sqlc.embed(tasks), sqlc.embed(chores), sqlc.embed(users)
 FROM tasks
 JOIN chores ON tasks.chore_id = chores.id
-JOIN users ON tasks.user_id = users.id;
+JOIN users ON tasks.user_id = users.id
+ORDER BY tasks.started_at;

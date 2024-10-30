@@ -49,7 +49,7 @@ func (r *Repository) ListTasks(ctx context.Context) ([]postgres.Task, error) {
 	return tasks, nil
 }
 
-func (r *Repository) Gettask(ctx context.Context, id uuid.UUID) (postgres.Task, error) {
+func (r *Repository) GetTask(ctx context.Context, id uuid.UUID) (postgres.Task, error) {
 	task, err := r.q.GetTask(ctx, id)
 	if err != nil {
 		if sqlErr := taskPgError(err); sqlErr != nil {
@@ -60,7 +60,7 @@ func (r *Repository) Gettask(ctx context.Context, id uuid.UUID) (postgres.Task, 
 	return task, nil
 }
 
-func (r *Repository) Updatetask(ctx context.Context, params postgres.UpdateTaskParams) (postgres.Task, error) {
+func (r *Repository) UpdateTask(ctx context.Context, params postgres.UpdateTaskParams) (postgres.Task, error) {
 	task, err := r.q.UpdateTask(ctx, params)
 	if err != nil {
 		if sqlErr := taskPgError(err); sqlErr != nil {
