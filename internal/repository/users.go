@@ -48,7 +48,7 @@ func (r *Repository) ListUsers(ctx context.Context) ([]postgres.User, error) {
 	return users, nil
 }
 
-func (r *Repository) Getuser(ctx context.Context, id int32) (postgres.User, error) {
+func (r *Repository) GetUser(ctx context.Context, id int32) (postgres.User, error) {
 	user, err := r.q.GetUser(ctx, id)
 	if err != nil {
 		if sqlErr := userPgError(err); sqlErr != nil {
@@ -59,7 +59,7 @@ func (r *Repository) Getuser(ctx context.Context, id int32) (postgres.User, erro
 	return user, nil
 }
 
-func (r *Repository) Updateuser(ctx context.Context, params postgres.UpdateUserParams) (postgres.User, error) {
+func (r *Repository) UpdateUser(ctx context.Context, params postgres.UpdateUserParams) (postgres.User, error) {
 	user, err := r.q.UpdateUser(ctx, params)
 	if err != nil {
 		if sqlErr := userPgError(err); sqlErr != nil {

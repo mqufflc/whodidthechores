@@ -31,6 +31,7 @@ func New(repo *repository.Repository, conf config.Config) http.Handler {
 	mux.HandleFunc("/chores/{id}", s.editChore)
 	mux.HandleFunc("/chores/new", s.createChore)
 	mux.HandleFunc("/users", s.users)
+	mux.HandleFunc("/users/{id}", s.editUser)
 	mux.HandleFunc("/users/new", s.createUser)
 	mux.HandleFunc("/tasks", s.tasks)
 	mux.HandleFunc("/tasks/new", s.createTask)
@@ -131,6 +132,27 @@ func (h *HTTPServer) viewUsers(w http.ResponseWriter, r *http.Request) {
 
 func (h *HTTPServer) createUser(w http.ResponseWriter, r *http.Request) {
 	html.UserCreate().Render(r.Context(), w)
+}
+
+func (h *HTTPServer) editUser(w http.ResponseWriter, r *http.Request) {
+	userID, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	if r.Method == "PUT" {
+		if _, err = h.repository.UpdateUser(r.Context(), postgres.UpdateUserParams{ID: int32(userID), Name: r.FormValue("name")}); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			slog.Error(fmt.Sprintf("internal server error: %v", err))
+			return
+		}
+	}
+	user, err := h.repository.GetUser(r.Context(), int32(userID))
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	html.UserEdit(user).Render(r.Context(), w)
 }
 
 func (h *HTTPServer) tasks(w http.ResponseWriter, r *http.Request) {

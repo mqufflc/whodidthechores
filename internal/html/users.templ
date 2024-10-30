@@ -10,6 +10,7 @@ templ usersTemplate(users []postgres.User) {
 		for _, user := range users {
 			<div id={ fmt.Sprintf("user-%d", user.ID) }>
 				Name: <span>{ user.Name }</span>
+			<p><a href={ templ.URL(fmt.Sprintf("/users/%d", user.ID)) }>Edit</a></p>
 			</div>
 		}
 	</div>
@@ -36,7 +37,24 @@ templ UserCreate() {
 				<button>Save</button>
 			</fieldset>
 		</form>
+		<p>
+			<a href="/users">Back</a>
+		</p>
+	}
+}
 
+templ UserEdit(user postgres.User) {
+	@layout("Edit a User") {
+		<form action={ templ.URL(fmt.Sprintf("/users/%d", user.ID)) } method="PUT">
+			<fieldset>
+				<legend>User Values</legend>
+				<p>
+					<label for="name">Name</label>
+					<input name="name" id="name" type="text" value={ user.Name }/>
+				</p>
+				<button>Save</button>
+			</fieldset>
+		</form>
 		<p>
 			<a href="/users">Back</a>
 		</p>
