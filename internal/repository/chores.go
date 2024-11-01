@@ -29,6 +29,7 @@ func chorePgError(err error) error {
 }
 
 type ChoreParams struct {
+	ID                int32
 	Name              string
 	Description       string
 	DefaultDurationMn string
@@ -43,7 +44,7 @@ type ChoreParamsError struct {
 
 func (r *Repository) ValidateChore(ctx context.Context, choreParams *ChoreParams) (postgres.CreateChoreParams, error) {
 	isErr := false
-	if err := r.ValidateChoreName(ctx, choreParams.Name); err != nil {
+	if err := r.ValidateChoreName(ctx, choreParams.Name, choreParams.ID); err != nil {
 		isErr = true
 		switch {
 		case errors.Is(err, ErrInvalidName):
@@ -86,7 +87,7 @@ func (r *Repository) ValidateChore(ctx context.Context, choreParams *ChoreParams
 	return postgres.CreateChoreParams{Name: choreParams.Name, Description: choreParams.Description, DefaultDurationMn: int32(default_duration)}, nil
 }
 
-func (r *Repository) ValidateChoreName(ctx context.Context, name string) error {
+func (r *Repository) ValidateChoreName(ctx context.Context, name string, id int32) error {
 	existingChores, err := r.q.ListChores(ctx)
 	if err != nil {
 		return fmt.Errorf("unable to get existing chores: %w", err)
@@ -97,7 +98,7 @@ func (r *Repository) ValidateChoreName(ctx context.Context, name string) error {
 	}
 
 	for _, chore := range existingChores {
-		if chore.Name == name {
+		if chore.Name == name && chore.ID != id {
 			return ErrDuplicateName
 		}
 	}
@@ -157,7 +158,13 @@ func (r *Repository) GetChore(ctx context.Context, id int32) (postgres.Chore, er
 	return chore, nil
 }
 
-func (r *Repository) UpdateChore(ctx context.Context, params postgres.UpdateChoreParams) (postgres.Chore, error) {
+func (r *Repository) UpdateChore(ctx context.Context, id int32, choreParams postgres.CreateChoreParams) (postgres.Chore, error) {
+	params := postgres.UpdateChoreParams{
+		ID:                id,
+		Name:              choreParams.Name,
+		Description:       choreParams.Description,
+		DefaultDurationMn: choreParams.DefaultDurationMn,
+	}
 	chore, err := r.q.UpdateChore(ctx, params)
 	if err != nil {
 		if sqlErr := chorePgError(err); sqlErr != nil {

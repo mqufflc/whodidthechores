@@ -69,7 +69,7 @@ func (h *HTTPServer) createChore(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		choreParams := repository.ChoreParams{Name: strings.TrimSpace(r.FormValue("name")), Description: strings.TrimSpace(r.FormValue("description")), DefaultDurationMn: r.FormValue("default_duration")}
+		choreParams := repository.ChoreParams{ID: -1, Name: strings.TrimSpace(r.FormValue("name")), Description: strings.TrimSpace(r.FormValue("description")), DefaultDurationMn: r.FormValue("default_duration")}
 		choreParamsValidated, err := h.repository.ValidateChore(r.Context(), &choreParams)
 		if err != nil {
 			if errors.Is(err, repository.ErrValidation) {
@@ -102,12 +102,18 @@ func (h *HTTPServer) editChore(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == "PUT" {
-		default_duration, err := strconv.Atoi(r.FormValue("default_duration"))
+		choreParams := repository.ChoreParams{ID: chore.ID, Name: strings.TrimSpace(r.FormValue("name")), Description: strings.TrimSpace(r.FormValue("description")), DefaultDurationMn: r.FormValue("default_duration")}
+		choreParamsValidated, err := h.repository.ValidateChore(r.Context(), &choreParams)
 		if err != nil {
+			if errors.Is(err, repository.ErrValidation) {
+				w.WriteHeader(http.StatusOK)
+				html.ChoreEdit(chore.ID, choreParams).Render(r.Context(), w)
+				return
+			}
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		if _, err = h.repository.UpdateChore(r.Context(), postgres.UpdateChoreParams{ID: chore.ID, Name: r.FormValue("name"), Description: r.FormValue("description"), DefaultDurationMn: int32(default_duration)}); err != nil {
+		if chore, err = h.repository.UpdateChore(r.Context(), chore.ID, choreParamsValidated); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			slog.Error(fmt.Sprintf("internal server error: %v", err))
 			return
@@ -123,7 +129,12 @@ func (h *HTTPServer) editChore(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}
-	html.ChoreEdit(chore).Render(r.Context(), w)
+	choreParams := repository.ChoreParams{
+		Name:              chore.Name,
+		Description:       chore.Description,
+		DefaultDurationMn: strconv.FormatInt(int64(chore.DefaultDurationMn), 10),
+	}
+	html.ChoreEdit(chore.ID, choreParams).Render(r.Context(), w)
 }
 
 func (h *HTTPServer) users(w http.ResponseWriter, r *http.Request) {
