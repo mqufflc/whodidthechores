@@ -59,8 +59,6 @@ func (r *Repository) ValidateChore(ctx context.Context, choreParams *ChoreParams
 	if err := r.ValidateChoreDescription(choreParams.Description); err != nil {
 		isErr = true
 		switch {
-		case errors.Is(err, ErrInvalidName):
-			choreParams.Errors.Description = "Description can't be empty"
 		default:
 			slog.Error(fmt.Sprintf("Unable to validate a description: %v", err))
 			choreParams.Errors.Description = "Unable to validate this description, please try again"
@@ -107,10 +105,6 @@ func (r *Repository) ValidateChoreName(ctx context.Context, name string, id int3
 }
 
 func (r *Repository) ValidateChoreDescription(name string) error {
-	if name == "" {
-		return ErrInvalidName
-	}
-
 	return nil
 }
 
