@@ -1,10 +1,12 @@
 package api
 
 import (
+	"errors"
 	"fmt"
 	"log/slog"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -49,23 +51,6 @@ func (h *HTTPServer) index(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *HTTPServer) chores(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST" {
-		slog.Info("Received POST on /chores")
-		if err := r.ParseForm(); err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		default_duration, err := strconv.Atoi(r.FormValue("default_duration"))
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		if _, err := h.repository.CreateChore(r.Context(), postgres.CreateChoreParams{Name: r.FormValue("name"), Description: r.FormValue("description"), DefaultDurationMn: int32(default_duration)}); err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		w.WriteHeader(http.StatusCreated)
-	}
 	h.viewChores(w, r)
 }
 
@@ -78,7 +63,30 @@ func (h *HTTPServer) viewChores(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *HTTPServer) createChore(w http.ResponseWriter, r *http.Request) {
-	html.ChoreCreate().Render(r.Context(), w)
+	if r.Method == "POST" {
+		slog.Info("Received POST on /chores")
+		if err := r.ParseForm(); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		choreParams := repository.ChoreParams{Name: strings.TrimSpace(r.FormValue("name")), Description: strings.TrimSpace(r.FormValue("description")), DefaultDurationMn: r.FormValue("default_duration")}
+		choreParamsValidated, err := h.repository.ValidateChore(r.Context(), &choreParams)
+		if err != nil {
+			if errors.Is(err, repository.ErrValidation) {
+				w.WriteHeader(http.StatusOK)
+				html.ChoreCreate(choreParams).Render(r.Context(), w)
+				return
+			}
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		if _, err := h.repository.CreateChore(r.Context(), choreParamsValidated); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		http.Redirect(w, r, "/chores", http.StatusSeeOther)
+	}
+	html.ChoreCreate(repository.ChoreParams{}).Render(r.Context(), w)
 }
 
 func (h *HTTPServer) editChore(w http.ResponseWriter, r *http.Request) {
@@ -87,23 +95,23 @@ func (h *HTTPServer) editChore(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+	chore, err := h.repository.GetChore(r.Context(), int32(choreID))
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		html.NotFound().Render(r.Context(), w)
+		return
+	}
 	if r.Method == "PUT" {
 		default_duration, err := strconv.Atoi(r.FormValue("default_duration"))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		if _, err = h.repository.UpdateChore(r.Context(), postgres.UpdateChoreParams{ID: int32(choreID), Name: r.FormValue("name"), Description: r.FormValue("description"), DefaultDurationMn: int32(default_duration)}); err != nil {
+		if _, err = h.repository.UpdateChore(r.Context(), postgres.UpdateChoreParams{ID: chore.ID, Name: r.FormValue("name"), Description: r.FormValue("description"), DefaultDurationMn: int32(default_duration)}); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			slog.Error(fmt.Sprintf("internal server error: %v", err))
 			return
 		}
-	}
-	chore, err := h.repository.GetChore(r.Context(), int32(choreID))
-	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
-		html.NotFound().Render(r.Context(), w)
-		return
 	}
 	if r.Method == "DELETE" {
 		err = h.repository.DeleteChore(r.Context(), chore.ID)

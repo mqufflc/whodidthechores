@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"strconv"
 
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/mqufflc/whodidthechores/internal/repository/postgres"
@@ -17,12 +18,109 @@ func chorePgError(err error) error {
 	}
 	switch pgErr.ConstraintName {
 	case "chores_name_key":
-		return errors.New("chore already exists")
+		return fmt.Errorf("%w: chore already exists", ErrDuplicateName)
 	case "chores_name_check":
-		return errors.New("invalid chore name")
+		return fmt.Errorf("%w: invalid chore name", ErrInvalidName)
+	case "tasks_chore_id_fkey":
+		return fmt.Errorf("%w: chore linked to existing task", ErrStillInUse)
 	}
-	slog.Error(fmt.Sprintf("uncaught chore pg error: %v", pgErr.Code))
-	return err
+	slog.Error(fmt.Sprintf("uncaught chore pg error: %v", pgErr))
+	return fmt.Errorf("%w: %w", ErrSQL, err)
+}
+
+type ChoreParams struct {
+	Name              string
+	Description       string
+	DefaultDurationMn string
+	Errors            ChoreParamsError
+}
+
+type ChoreParamsError struct {
+	Name              string
+	Description       string
+	DefaultDurationMn string
+}
+
+func (r *Repository) ValidateChore(ctx context.Context, choreParams *ChoreParams) (postgres.CreateChoreParams, error) {
+	isErr := false
+	if err := r.ValidateChoreName(ctx, choreParams.Name); err != nil {
+		isErr = true
+		switch {
+		case errors.Is(err, ErrInvalidName):
+			choreParams.Errors.Name = "Name can't be empty"
+		case errors.Is(err, ErrDuplicateName):
+			choreParams.Errors.Name = "Name already taken, please chose another one"
+		default:
+			slog.Error(fmt.Sprintf("Unable to validate a name: %v", err))
+			choreParams.Errors.Name = "Unable to validate this name, please try again"
+		}
+	}
+	if err := r.ValidateChoreDescription(choreParams.Description); err != nil {
+		isErr = true
+		switch {
+		case errors.Is(err, ErrInvalidName):
+			choreParams.Errors.Description = "Description can't be empty"
+		default:
+			slog.Error(fmt.Sprintf("Unable to validate a description: %v", err))
+			choreParams.Errors.Description = "Unable to validate this description, please try again"
+		}
+	}
+	default_duration, err := strconv.Atoi(choreParams.DefaultDurationMn)
+	if err != nil {
+		isErr = true
+		choreParams.Errors.DefaultDurationMn = "Please enter a number"
+	} else if err = r.ValidateChoreDefaultDuration(default_duration); err != nil {
+		switch {
+		case errors.Is(err, ErrTooSmall):
+			choreParams.Errors.DefaultDurationMn = "Default duration can't be negative"
+		case errors.Is(err, ErrTooBig):
+			choreParams.Errors.DefaultDurationMn = "Default duration too big, please select a smaller number"
+		default:
+			slog.Error(fmt.Sprintf("Unable to validate a default duration: %v", err))
+			choreParams.Errors.DefaultDurationMn = "Unable to validate this duration, please try again"
+		}
+	}
+	if isErr {
+		return postgres.CreateChoreParams{}, ErrValidation
+	}
+	return postgres.CreateChoreParams{Name: choreParams.Name, Description: choreParams.Description, DefaultDurationMn: int32(default_duration)}, nil
+}
+
+func (r *Repository) ValidateChoreName(ctx context.Context, name string) error {
+	existingChores, err := r.q.ListChores(ctx)
+	if err != nil {
+		return fmt.Errorf("unable to get existing chores: %w", err)
+	}
+
+	if name == "" {
+		return ErrInvalidName
+	}
+
+	for _, chore := range existingChores {
+		if chore.Name == name {
+			return ErrDuplicateName
+		}
+	}
+
+	return nil
+}
+
+func (r *Repository) ValidateChoreDescription(name string) error {
+	if name == "" {
+		return ErrInvalidName
+	}
+
+	return nil
+}
+
+func (r *Repository) ValidateChoreDefaultDuration(default_duration int) error {
+	if default_duration < 0 {
+		return ErrTooSmall
+	}
+	if default_duration > 2147483647 {
+		return ErrTooBig
+	}
+	return nil
 }
 
 func (r *Repository) CreateChore(ctx context.Context, params postgres.CreateChoreParams) (postgres.Chore, error) {
