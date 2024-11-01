@@ -69,3 +69,14 @@ func (r *Repository) UpdateChore(ctx context.Context, params postgres.UpdateChor
 	}
 	return chore, nil
 }
+
+func (r *Repository) DeleteChore(ctx context.Context, id int32) error {
+	err := r.q.DeleteChore(ctx, id)
+	if err != nil {
+		if sqlErr := chorePgError(err); sqlErr != nil {
+			return sqlErr
+		}
+		return err
+	}
+	return nil
+}

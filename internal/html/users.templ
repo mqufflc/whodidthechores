@@ -56,6 +56,9 @@ templ UserEdit(user postgres.User) {
 			</fieldset>
 		</form>
 		<p>
+			<button hx-delete={ fmt.Sprintf("/users/%d", user.ID) }>Delete</button>
+		</p>
+		<p>
 			<a href="/users">Back</a>
 		</p>
 	}

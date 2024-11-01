@@ -69,3 +69,14 @@ func (r *Repository) UpdateUser(ctx context.Context, params postgres.UpdateUserP
 	}
 	return user, nil
 }
+
+func (r *Repository) DeleteUser(ctx context.Context, id int32) error {
+	err := r.q.DeleteUser(ctx, id)
+	if err != nil {
+		if sqlErr := userPgError(err); sqlErr != nil {
+			return sqlErr
+		}
+		return err
+	}
+	return nil
+}

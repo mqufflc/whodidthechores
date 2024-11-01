@@ -81,3 +81,14 @@ func (r *Repository) ListUsersTasks(ctx context.Context) ([]postgres.ListUsersTa
 	}
 	return tasks, nil
 }
+
+func (r *Repository) DeleteTask(ctx context.Context, id uuid.UUID) error {
+	err := r.q.DeleteTask(ctx, id)
+	if err != nil {
+		if sqlErr := taskPgError(err); sqlErr != nil {
+			return sqlErr
+		}
+		return err
+	}
+	return nil
+}

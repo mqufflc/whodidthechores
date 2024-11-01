@@ -118,6 +118,9 @@ templ TaskEdit(task postgres.Task, chores []postgres.Chore, users []postgres.Use
 			</fieldset>
 		</form>
 		<p>
+			<button hx-delete={ fmt.Sprintf("/tasks/%v", task.ID.String()) }>Delete</button>
+		</p>
+		<p>
 			<a href="/tasks">Back</a>
 		</p>
 	}

@@ -13,7 +13,7 @@ templ choresTemplate(chores []postgres.Chore) {
 				Name: <span>{ chore.Name }</span>
 				Description: <span>{ chore.Description }</span>
 				Default Duration: <span>{ strconv.FormatInt(int64(chore.DefaultDurationMn), 10) } mn</span>
-			<p><a href={ templ.URL(fmt.Sprintf("/chores/%d", chore.ID)) }>Edit</a></p>
+				<p><a href={ templ.URL(fmt.Sprintf("/chores/%d", chore.ID)) }>Edit</a></p>
 			</div>
 		}
 	</div>
@@ -72,6 +72,9 @@ templ ChoreEdit(chore postgres.Chore) {
 			</p>
 			<button>Save</button>
 		</form>
+		<p>
+			<button hx-delete={ fmt.Sprintf("/chores/%d", chore.ID) }>Delete</button>
+		</p>
 		<p>
 			<a href="/chores">Back</a>
 		</p>

@@ -41,7 +41,6 @@ func New(repo *repository.Repository, conf config.Config) http.Handler {
 }
 
 func (h *HTTPServer) notFound(w http.ResponseWriter, r *http.Request) {
-	http.Error(w, "not found", http.StatusNotFound)
 	html.NotFound().Render(r.Context(), w)
 }
 
@@ -103,6 +102,17 @@ func (h *HTTPServer) editChore(w http.ResponseWriter, r *http.Request) {
 	chore, err := h.repository.GetChore(r.Context(), int32(choreID))
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
+		html.NotFound().Render(r.Context(), w)
+		return
+	}
+	if r.Method == "DELETE" {
+		err = h.repository.DeleteChore(r.Context(), chore.ID)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		w.Header().Add("HX-Location", "/chores")
+		w.WriteHeader(http.StatusNoContent)
 		return
 	}
 	html.ChoreEdit(chore).Render(r.Context(), w)
@@ -152,6 +162,17 @@ func (h *HTTPServer) editUser(w http.ResponseWriter, r *http.Request) {
 	user, err := h.repository.GetUser(r.Context(), int32(userID))
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
+		html.NotFound().Render(r.Context(), w)
+		return
+	}
+	if r.Method == "DELETE" {
+		err = h.repository.DeleteUser(r.Context(), user.ID)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		w.Header().Add("HX-Location", "/users")
+		w.WriteHeader(http.StatusNoContent)
 		return
 	}
 	html.UserEdit(user).Render(r.Context(), w)
@@ -277,6 +298,16 @@ func (h *HTTPServer) editTask(w http.ResponseWriter, r *http.Request) {
 	task, err := h.repository.GetTask(r.Context(), taskID)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	if r.Method == "DELETE" {
+		err = h.repository.DeleteTask(r.Context(), task.ID)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		w.Header().Add("HX-Location", "/tasks")
+		w.WriteHeader(http.StatusNoContent)
 		return
 	}
 	chores, err := h.repository.ListChores(r.Context())
