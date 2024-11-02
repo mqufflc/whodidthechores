@@ -58,15 +58,17 @@ func (h *HTTPServer) viewChores(w http.ResponseWriter, r *http.Request) {
 	chores, err := h.repository.ListChores(r.Context())
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		slog.Error(fmt.Sprintf("unable to list chores: %v", err))
+		return
 	}
 	html.Chores(chores).Render(r.Context(), w)
 }
 
 func (h *HTTPServer) createChore(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
-		slog.Info("Received POST on /chores")
 		if err := r.ParseForm(); err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
+			w.WriteHeader(http.StatusBadRequest)
+			slog.Warn(fmt.Sprintf("unable to parse form: %v", err))
 			return
 		}
 		choreParams := repository.ChoreParams{ID: -1, Name: strings.TrimSpace(r.FormValue("name")), Description: strings.TrimSpace(r.FormValue("description")), DefaultDurationMn: r.FormValue("default_duration")}
@@ -78,13 +80,16 @@ func (h *HTTPServer) createChore(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			w.WriteHeader(http.StatusInternalServerError)
+			slog.Error(fmt.Sprintf("unable to validate chore: %v", err))
 			return
 		}
 		if _, err := h.repository.CreateChore(r.Context(), choreParamsValidated); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			slog.Error(fmt.Sprintf("unable to create chore: %v", err))
 			return
 		}
 		http.Redirect(w, r, "/chores", http.StatusSeeOther)
+		return
 	}
 	html.ChoreCreate(repository.ChoreParams{}).Render(r.Context(), w)
 }
@@ -107,15 +112,17 @@ func (h *HTTPServer) editChore(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			if errors.Is(err, repository.ErrValidation) {
 				w.WriteHeader(http.StatusOK)
-				html.ChoreEdit(chore.ID, choreParams).Render(r.Context(), w)
+				html.ChoreEdit(choreParams).Render(r.Context(), w)
 				return
 			}
 			w.WriteHeader(http.StatusInternalServerError)
+			slog.Error(fmt.Sprintf("unable to validate chore: %v", err))
 			return
 		}
-		if chore, err = h.repository.UpdateChore(r.Context(), chore.ID, choreParamsValidated); err != nil {
+		chore, err = h.repository.UpdateChore(r.Context(), chore.ID, choreParamsValidated)
+		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			slog.Error(fmt.Sprintf("internal server error: %v", err))
+			slog.Error(fmt.Sprintf("unable to edit chore: %v", err))
 			return
 		}
 	}
@@ -123,6 +130,7 @@ func (h *HTTPServer) editChore(w http.ResponseWriter, r *http.Request) {
 		err = h.repository.DeleteChore(r.Context(), chore.ID)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			slog.Error(fmt.Sprintf("unable to delete chore: %v", err))
 			return
 		}
 		w.Header().Add("HX-Location", "/chores")
@@ -130,26 +138,15 @@ func (h *HTTPServer) editChore(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	choreParams := repository.ChoreParams{
+		ID:                chore.ID,
 		Name:              chore.Name,
 		Description:       chore.Description,
 		DefaultDurationMn: strconv.FormatInt(int64(chore.DefaultDurationMn), 10),
 	}
-	html.ChoreEdit(chore.ID, choreParams).Render(r.Context(), w)
+	html.ChoreEdit(choreParams).Render(r.Context(), w)
 }
 
 func (h *HTTPServer) users(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST" {
-		slog.Info("Received POST on /users")
-		if err := r.ParseForm(); err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		if _, err := h.repository.CreateUser(r.Context(), r.FormValue("name")); err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		w.WriteHeader(http.StatusCreated)
-	}
 	h.viewUsers(w, r)
 }
 
@@ -157,12 +154,42 @@ func (h *HTTPServer) viewUsers(w http.ResponseWriter, r *http.Request) {
 	users, err := h.repository.ListUsers(r.Context())
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		slog.Error(fmt.Sprintf("unable to get users: %v", err))
+		return
 	}
 	html.Users(users).Render(r.Context(), w)
 }
 
 func (h *HTTPServer) createUser(w http.ResponseWriter, r *http.Request) {
-	html.UserCreate().Render(r.Context(), w)
+	if r.Method == "POST" {
+		if err := r.ParseForm(); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			slog.Error(fmt.Sprintf("user create parsing: %v", err))
+			return
+		}
+		userParams := repository.UserParams{
+			ID:   -1,
+			Name: r.FormValue("name"),
+		}
+		validatedName, err := h.repository.ValidateUser(r.Context(), &userParams)
+		if err != nil {
+			if errors.Is(err, repository.ErrValidation) {
+				w.WriteHeader(http.StatusOK)
+				html.UserCreate(userParams).Render(r.Context(), w)
+				return
+			}
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		if _, err := h.repository.CreateUser(r.Context(), validatedName); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			slog.Error(fmt.Sprintf("user create error: %v", err))
+			return
+		}
+		http.Redirect(w, r, "/users", http.StatusSeeOther)
+		return
+	}
+	html.UserCreate(repository.UserParams{}).Render(r.Context(), w)
 }
 
 func (h *HTTPServer) editUser(w http.ResponseWriter, r *http.Request) {
@@ -171,30 +198,51 @@ func (h *HTTPServer) editUser(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	if r.Method == "PUT" {
-		if _, err = h.repository.UpdateUser(r.Context(), postgres.UpdateUserParams{ID: int32(userID), Name: r.FormValue("name")}); err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			slog.Error(fmt.Sprintf("internal server error: %v", err))
-			return
-		}
-	}
 	user, err := h.repository.GetUser(r.Context(), int32(userID))
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		html.NotFound().Render(r.Context(), w)
 		return
 	}
+	if r.Method == "PUT" {
+		userParams := repository.UserParams{
+			ID:   user.ID,
+			Name: strings.TrimSpace(r.FormValue("name")),
+		}
+		validatedName, err := h.repository.ValidateUser(r.Context(), &userParams)
+		if err != nil {
+			if errors.Is(err, repository.ErrValidation) {
+				w.WriteHeader(http.StatusOK)
+				html.UserEdit(userParams).Render(r.Context(), w)
+				return
+			}
+			w.WriteHeader(http.StatusInternalServerError)
+			slog.Error(fmt.Sprintf("unable to validate user: %v", err))
+			return
+		}
+		user, err = h.repository.UpdateUser(r.Context(), user.ID, validatedName)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			slog.Error(fmt.Sprintf("unable to edit user: %v", err))
+			return
+		}
+	}
 	if r.Method == "DELETE" {
 		err = h.repository.DeleteUser(r.Context(), user.ID)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			slog.Error(fmt.Sprintf("user delete error: %v", err))
 			return
 		}
 		w.Header().Add("HX-Location", "/users")
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}
-	html.UserEdit(user).Render(r.Context(), w)
+	userParams := repository.UserParams{
+		ID:   user.ID,
+		Name: user.Name,
+	}
+	html.UserEdit(userParams).Render(r.Context(), w)
 }
 
 func (h *HTTPServer) tasks(w http.ResponseWriter, r *http.Request) {
@@ -202,6 +250,7 @@ func (h *HTTPServer) tasks(w http.ResponseWriter, r *http.Request) {
 		slog.Info("Received POST on /tasks")
 		if err := r.ParseForm(); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			slog.Error(fmt.Sprintf("internal server error: %v", err))
 			return
 		}
 		choreID, err := strconv.Atoi(r.FormValue("chore-id"))

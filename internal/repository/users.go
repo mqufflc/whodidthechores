@@ -17,12 +17,63 @@ func userPgError(err error) error {
 	}
 	switch pgErr.ConstraintName {
 	case "users_name_key":
-		return errors.New("user already exists")
+		return ErrDuplicateName
 	case "users_name_check":
-		return errors.New("invalid user name")
+		return ErrInvalidName
+	case "tasks_user_id_fkey":
+		return ErrStillInUse
 	}
 	slog.Error(fmt.Sprintf("uncaught user pg error: %v", pgErr.Code))
 	return err
+}
+
+type UserParams struct {
+	ID     int32
+	Name   string
+	Errors UserParamsError
+}
+
+type UserParamsError struct {
+	Name string
+}
+
+func (r *Repository) ValidateUser(ctx context.Context, userParams *UserParams) (string, error) {
+	isErr := false
+	if err := r.ValidateUserName(ctx, userParams.Name, userParams.ID); err != nil {
+		isErr = true
+		switch {
+		case errors.Is(err, ErrInvalidName):
+			userParams.Errors.Name = "Name can't be empty"
+		case errors.Is(err, ErrDuplicateName):
+			userParams.Errors.Name = "Name already taken, please chose another one"
+		default:
+			slog.Error(fmt.Sprintf("Unable to validate a name: %v", err))
+			userParams.Errors.Name = "Unable to validate this name, please try again"
+		}
+	}
+	if isErr {
+		return "", ErrValidation
+	}
+	return userParams.Name, nil
+}
+
+func (r *Repository) ValidateUserName(ctx context.Context, name string, id int32) error {
+	existingUsers, err := r.q.ListUsers(ctx)
+	if err != nil {
+		return fmt.Errorf("unable to get existing users: %w", err)
+	}
+
+	if name == "" {
+		return ErrInvalidName
+	}
+
+	for _, user := range existingUsers {
+		if user.Name == name && user.ID != id {
+			return ErrDuplicateName
+		}
+	}
+
+	return nil
 }
 
 func (r *Repository) CreateUser(ctx context.Context, name string) (postgres.User, error) {
@@ -59,7 +110,11 @@ func (r *Repository) GetUser(ctx context.Context, id int32) (postgres.User, erro
 	return user, nil
 }
 
-func (r *Repository) UpdateUser(ctx context.Context, params postgres.UpdateUserParams) (postgres.User, error) {
+func (r *Repository) UpdateUser(ctx context.Context, id int32, name string) (postgres.User, error) {
+	params := postgres.UpdateUserParams{
+		ID:   id,
+		Name: name,
+	}
 	user, err := r.q.UpdateUser(ctx, params)
 	if err != nil {
 		if sqlErr := userPgError(err); sqlErr != nil {

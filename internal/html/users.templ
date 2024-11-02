@@ -2,6 +2,7 @@ package html
 
 import (
 	"fmt"
+	"github.com/mqufflc/whodidthechores/internal/repository"
 	"github.com/mqufflc/whodidthechores/internal/repository/postgres"
 )
 
@@ -10,7 +11,7 @@ templ usersTemplate(users []postgres.User) {
 		for _, user := range users {
 			<div id={ fmt.Sprintf("user-%d", user.ID) }>
 				Name: <span>{ user.Name }</span>
-			<p><a href={ templ.URL(fmt.Sprintf("/users/%d", user.ID)) }>Edit</a></p>
+				<p><a href={ templ.URL(fmt.Sprintf("/users/%d", user.ID)) }>Edit</a></p>
 			</div>
 		}
 	</div>
@@ -25,17 +26,10 @@ templ Users(users []postgres.User) {
 	}
 }
 
-templ UserCreate() {
+templ UserCreate(userParams repository.UserParams) {
 	@layout("Create a new User") {
-		<form action="/users" method="post">
-			<fieldset>
-				<legend>User Values</legend>
-				<p>
-					<label for="name">Name</label>
-					<input name="name" id="name" type="text"/>
-				</p>
-				<button>Save</button>
-			</fieldset>
+		<form action="/users/new" method="post">
+			@userFieldSet(userParams)
 		</form>
 		<p>
 			<a href="/users">Back</a>
@@ -43,23 +37,28 @@ templ UserCreate() {
 	}
 }
 
-templ UserEdit(user postgres.User) {
+templ UserEdit(userParams repository.UserParams) {
 	@layout("Edit a User") {
-		<form action={ templ.URL(fmt.Sprintf("/users/%d", user.ID)) } method="PUT">
-			<fieldset>
-				<legend>User Values</legend>
-				<p>
-					<label for="name">Name</label>
-					<input name="name" id="name" type="text" value={ user.Name }/>
-				</p>
-				<button>Save</button>
-			</fieldset>
+		<form action={ templ.URL(fmt.Sprintf("/users/%d", userParams.ID)) } method="PUT">
+			@userFieldSet(userParams)
 		</form>
 		<p>
-			<button hx-delete={ fmt.Sprintf("/users/%d", user.ID) }>Delete</button>
+			<button hx-delete={ fmt.Sprintf("/users/%d", userParams.ID) } hx-confirm="Are you sure you want to delete this user?">Delete</button>
 		</p>
 		<p>
 			<a href="/users">Back</a>
 		</p>
 	}
+}
+
+templ userFieldSet(userParams repository.UserParams) {
+	<fieldset>
+		<legend>User Values</legend>
+		<p>
+			<label for="name">Name</label>
+			<input name="name" id="name" type="text" value={ userParams.Name } required/>
+			<span>{ userParams.Errors.Name }</span>
+		</p>
+		<button>Save</button>
+	</fieldset>
 }

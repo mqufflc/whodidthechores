@@ -40,13 +40,13 @@ templ ChoreCreate(choreParams repository.ChoreParams) {
 	}
 }
 
-templ ChoreEdit(id int32, choreParams repository.ChoreParams) {
+templ ChoreEdit(choreParams repository.ChoreParams) {
 	@layout("Edit a Chore") {
-		<form action={ templ.URL(fmt.Sprintf("/chores/%d", id)) } method="PUT">
+		<form action={ templ.URL(fmt.Sprintf("/chores/%d", choreParams.ID)) } method="PUT">
 			@choreFieldSet(choreParams)
 		</form>
 		<p>
-			<button hx-delete={ fmt.Sprintf("/chores/%d", id) } hx-confirm="Are you sure you want to delete this chore?">Delete</button>
+			<button hx-delete={ fmt.Sprintf("/chores/%d", choreParams.ID) } hx-confirm="Are you sure you want to delete this chore?">Delete</button>
 		</p>
 		<p>
 			<a href="/chores">Back</a>
