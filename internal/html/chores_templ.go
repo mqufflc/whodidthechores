@@ -319,79 +319,79 @@ func choreFieldSet(choreParams repository.ChoreParams) templ.Component {
 			templ_7745c5c3_Var15 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<fieldset><legend>Chore Values</legend><p><label for=\"name\">Name</label> <input name=\"name\" id=\"name\" type=\"text\" placeholder=\"Dishes\" value=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<fieldset><legend>Chore Values</legend><p><label class=\"form-control w-full max-w-xs\" for=\"name\">Name</label> <input class=\"input input-bordered w-full max-w-xs\" name=\"name\" id=\"name\" type=\"text\" placeholder=\"Dishes\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var16 string
 		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(choreParams.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/chores.templ`, Line: 62, Col: 89}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/chores.templ`, Line: 62, Col: 134}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" required> <span>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" required> <span class=\"label-text-alt\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var17 string
 		templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(choreParams.Errors.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/chores.templ`, Line: 63, Col: 34}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/chores.templ`, Line: 63, Col: 57}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</span></p><p><label for=\"description\">Description</label> <input name=\"description\" id=\"description\" type=\"text\" placeholder=\"Washing the dishes\" value=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</span></p><p><label class=\"form-control w-full max-w-xs\" for=\"description\">Description</label> <input class=\"input input-bordered w-full max-w-xs\" name=\"description\" id=\"description\" type=\"text\" placeholder=\"Washing the dishes\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var18 string
 		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(choreParams.Description)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/chores.templ`, Line: 67, Col: 122}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/chores.templ`, Line: 67, Col: 167}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"> <span>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"> <span class=\"label-text-alt\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var19 string
 		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(choreParams.Errors.Description)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/chores.templ`, Line: 68, Col: 41}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/chores.templ`, Line: 68, Col: 64}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</span></p><p><label for=\"default_duration\">Default Duration (mn)</label> <input name=\"default_duration\" id=\"default_duration\" type=\"number\" placeholder=\"15\" min=\"0\" value=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</span></p><p><label class=\"form-control w-full max-w-xs\" for=\"default_duration\">Default Duration (mn)</label> <input class=\"input input-bordered w-full max-w-xs\" name=\"default_duration\" id=\"default_duration\" type=\"number\" placeholder=\"15\" min=\"0\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var20 string
 		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(choreParams.DefaultDurationMn)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/chores.templ`, Line: 72, Col: 132}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/chores.templ`, Line: 72, Col: 177}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" required> <span>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" required> <span class=\"label-text-alt\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var21 string
 		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(choreParams.Errors.DefaultDurationMn)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/chores.templ`, Line: 73, Col: 47}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/chores.templ`, Line: 73, Col: 70}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 		if templ_7745c5c3_Err != nil {

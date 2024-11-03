@@ -1,42 +1,46 @@
 package html
 
 templ navTemplate() {
-    <nav>
-		<ul>
-			<li><a href="/">Home</a></li>
-			<li><a href="/chores">Chores</a></li>
-			<li><a href="/users">Users</a></li>
-			<li><a href="/tasks">Tasks</a></li>
-		</ul>
+	<nav class="navbar">
+		<div class="navbar-start">
+			<a class="btn btn-ghost text-xl" href="/">Who Did The Chores</a>
+		</div>
+		<div class="navbar-center hidden lg:flex">
+			<ul class="menu menu-horizontal px-1">
+				<li><a href="/chores">Chores</a></li>
+				<li><a href="/users">Users</a></li>
+				<li><a href="/tasks">Tasks</a></li>
+			</ul>
+		</div>
 	</nav>
 }
 
 templ layout(title string) {
-    <!DOCTYPE html>
-    <html lang="en">
-        <head>
-            <title>{ title }</title>
-            <meta charset="UTF-8"/>
-            <meta name="viewport" content="width=device-width, initial-scale=1"/>
-            <script src="https://unpkg.com/htmx.org@2.0.3" integrity="sha384-0895/pl2MU10Hqc6jd4RvrthNlDiE9U1tWmX7WRESftEDRosgxNsQG/Ze9YMRzHq" crossorigin="anonymous"></script>
-            <link href="./static/stylesheet.css" rel="stylesheet">
-        </head>
-        <body hx-boost="true">
-            @navTemplate()
-           { children... }
-        </body>
-    </html>
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<title>{ title }</title>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1"/>
+			<script src="https://unpkg.com/htmx.org@2.0.3" integrity="sha384-0895/pl2MU10Hqc6jd4RvrthNlDiE9U1tWmX7WRESftEDRosgxNsQG/Ze9YMRzHq" crossorigin="anonymous"></script>
+			<link href="/static/stylesheet.css" rel="stylesheet"/>
+		</head>
+		<body hx-boost="true">
+			@navTemplate()
+			{ children... }
+		</body>
+	</html>
 }
 
 templ Index() {
-    @layout("Who Did The Chores") {
-        <h2 class="text-2xl font-bold underline">Welcome to Who Did The Chores !</h2>
-    }
+	@layout("Who Did The Chores") {
+		<h2 class="text-3xl font-bold underline">Welcome to Who Did The Chores !</h2>
+	}
 }
 
 templ NotFound() {
-    @layout("Not Found") {
-        <h2>You are lost</h2>
-        <p>Come back using the navigation menu.</p>
-    }
+	@layout("Not Found") {
+		<h2>You are lost</h2>
+		<p>Come back using the navigation menu.</p>
+	}
 }

@@ -58,19 +58,19 @@ templ choreFieldSet(choreParams repository.ChoreParams) {
 	<fieldset>
 		<legend>Chore Values</legend>
 		<p>
-			<label for="name">Name</label>
-			<input name="name" id="name" type="text" placeholder="Dishes" value={ choreParams.Name } required/>
-			<span>{ choreParams.Errors.Name }</span>
+			<label class="form-control w-full max-w-xs" for="name">Name</label>
+			<input class="input input-bordered w-full max-w-xs" name="name" id="name" type="text" placeholder="Dishes" value={ choreParams.Name } required/>
+			<span class="label-text-alt">{ choreParams.Errors.Name }</span>
 		</p>
 		<p>
-			<label for="description">Description</label>
-			<input name="description" id="description" type="text" placeholder="Washing the dishes" value={ choreParams.Description }/>
-			<span>{ choreParams.Errors.Description }</span>
+			<label class="form-control w-full max-w-xs" for="description">Description</label>
+			<input class="input input-bordered w-full max-w-xs" name="description" id="description" type="text" placeholder="Washing the dishes" value={ choreParams.Description }/>
+			<span class="label-text-alt">{ choreParams.Errors.Description }</span>
 		</p>
 		<p>
-			<label for="default_duration">Default Duration (mn)</label>
-			<input name="default_duration" id="default_duration" type="number" placeholder="15" min="0" value={ choreParams.DefaultDurationMn } required/>
-			<span>{ choreParams.Errors.DefaultDurationMn }</span>
+			<label class="form-control w-full max-w-xs" for="default_duration">Default Duration (mn)</label>
+			<input class="input input-bordered w-full max-w-xs" name="default_duration" id="default_duration" type="number" placeholder="15" min="0" value={ choreParams.DefaultDurationMn } required/>
+			<span class="label-text-alt">{ choreParams.Errors.DefaultDurationMn }</span>
 		</p>
 		<button>Save</button>
 	</fieldset>
