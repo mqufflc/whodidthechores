@@ -11,4 +11,5 @@ var (
 	ErrValidation    = errors.New("validation error")
 	ErrTooSmall      = errors.New("number too small")
 	ErrTooBig        = errors.New("number too big")
+	ErrParseInt      = errors.New("string not containing a number")
 )

@@ -246,49 +246,6 @@ func (h *HTTPServer) editUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *HTTPServer) tasks(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST" {
-		slog.Info("Received POST on /tasks")
-		if err := r.ParseForm(); err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			slog.Error(fmt.Sprintf("internal server error: %v", err))
-			return
-		}
-		choreID, err := strconv.Atoi(r.FormValue("chore-id"))
-		if err != nil {
-			slog.Error(fmt.Sprintf("Unable to parse chore id: %v", err))
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		userID, err := strconv.Atoi(r.FormValue("user-id"))
-		if err != nil {
-			slog.Error(fmt.Sprintf("Unable to parse user id: %v", err))
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		startedAt, err := time.ParseInLocation("2006-01-02T15:04", r.FormValue("start-time"), h.timezone)
-		if err != nil {
-			slog.Error(fmt.Sprintf("Unable to parse started time: %v", err))
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		duration, err := strconv.Atoi(r.FormValue("duration"))
-		if err != nil {
-			slog.Error(fmt.Sprintf("Unable to parse duration: %v", err))
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		if _, err := h.repository.CreateTask(r.Context(), postgres.CreateTaskParams{
-			ChoreID:     int32(choreID),
-			UserID:      int32(userID),
-			StartedAt:   startedAt,
-			DurationMn:  int32(duration),
-			Description: r.FormValue("description"),
-		}); err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		w.WriteHeader(http.StatusCreated)
-	}
 	h.viewTasks(w, r)
 }
 
@@ -313,7 +270,43 @@ func (h *HTTPServer) createTask(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	html.TaskCreate(chores, users).Render(r.Context(), w)
+	if r.Method == "POST" {
+		if err := r.ParseForm(); err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			slog.Warn(fmt.Sprintf("unable to parse form: %v", err))
+			return
+		}
+		taskParams := repository.TaskParams{
+			ID:          uuid.UUID{},
+			ChoreID:     r.FormValue("chore-id"),
+			UserID:      r.FormValue("user-id"),
+			StartedAt:   r.FormValue("start-time"),
+			DurationMn:  r.FormValue("duration"),
+			Description: r.FormValue("description"),
+		}
+		taskParamsValidated, err := h.repository.ValidateTask(r.Context(), &taskParams, *h.timezone)
+		if err != nil {
+			if errors.Is(err, repository.ErrValidation) {
+				w.WriteHeader(http.StatusOK)
+				html.TaskCreate(taskParams, chores, users).Render(r.Context(), w)
+				return
+			}
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		h.repository.CreateTask(r.Context(), taskParamsValidated)
+		http.Redirect(w, r, "/tasks", http.StatusSeeOther)
+		return
+	}
+	taskParams := repository.TaskParams{
+		ID:          uuid.UUID{},
+		UserID:      strconv.FormatInt(int64(users[0].ID), 10),
+		ChoreID:     strconv.FormatInt(int64(chores[0].ID), 10),
+		StartedAt:   time.Now().In(h.timezone).Format("2006-01-02T15:04"),
+		DurationMn:  "",
+		Description: "",
+	}
+	html.TaskCreate(taskParams, chores, users).Render(r.Context(), w)
 }
 
 func (h *HTTPServer) editTask(w http.ResponseWriter, r *http.Request) {
@@ -321,47 +314,6 @@ func (h *HTTPServer) editTask(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
-	}
-	if r.Method == "PUT" {
-		if err := r.ParseForm(); err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		choreID, err := strconv.Atoi(r.FormValue("chore-id"))
-		if err != nil {
-			slog.Error(fmt.Sprintf("Unable to parse chore id: %v", err))
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		userID, err := strconv.Atoi(r.FormValue("user-id"))
-		if err != nil {
-			slog.Error(fmt.Sprintf("Unable to parse user id: %v", err))
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		startedAt, err := time.ParseInLocation("2006-01-02T15:04", r.FormValue("start-time"), h.timezone)
-		if err != nil {
-			slog.Error(fmt.Sprintf("Unable to parse started time: %v", err))
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		duration, err := strconv.Atoi(r.FormValue("duration"))
-		if err != nil {
-			slog.Error(fmt.Sprintf("Unable to parse duration: %v", err))
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		if _, err := h.repository.UpdateTask(r.Context(), postgres.UpdateTaskParams{
-			ID:          taskID,
-			ChoreID:     int32(choreID),
-			UserID:      int32(userID),
-			StartedAt:   startedAt,
-			DurationMn:  int32(duration),
-			Description: r.FormValue("description"),
-		}); err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
 	}
 	task, err := h.repository.GetTask(r.Context(), taskID)
 	if err != nil {
@@ -390,5 +342,50 @@ func (h *HTTPServer) editTask(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	html.TaskEdit(task, chores, users, h.timezone).Render(r.Context(), w)
+	if r.Method == "PUT" {
+		if err := r.ParseForm(); err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			slog.Warn(fmt.Sprintf("unable to parse form: %v", err))
+			return
+		}
+		taskParams := repository.TaskParams{
+			ID:          task.ID,
+			ChoreID:     r.FormValue("chore-id"),
+			UserID:      r.FormValue("user-id"),
+			StartedAt:   r.FormValue("start-time"),
+			DurationMn:  r.FormValue("duration"),
+			Description: r.FormValue("description"),
+		}
+		taskParamsValidated, err := h.repository.ValidateTask(r.Context(), &taskParams, *h.timezone)
+		if err != nil {
+			if errors.Is(err, repository.ErrValidation) {
+				w.WriteHeader(http.StatusOK)
+				html.TaskEdit(taskParams, chores, users).Render(r.Context(), w)
+				return
+			}
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		task, err = h.repository.UpdateTask(r.Context(), task.ID, postgres.CreateTaskParams{
+			ChoreID:     taskParamsValidated.ChoreID,
+			UserID:      taskParamsValidated.UserID,
+			StartedAt:   taskParamsValidated.StartedAt,
+			DurationMn:  taskParamsValidated.DurationMn,
+			Description: taskParamsValidated.Description,
+		})
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			slog.Error(fmt.Sprintf("unable to edit task: %v", err))
+			return
+		}
+	}
+	taskParams := repository.TaskParams{
+		ID:          task.ID,
+		UserID:      strconv.FormatInt(int64(task.UserID), 10),
+		ChoreID:     strconv.FormatInt(int64(task.ChoreID), 10),
+		StartedAt:   task.StartedAt.In(h.timezone).Format("2006-01-02T15:04"),
+		DurationMn:  strconv.FormatInt(int64(task.DurationMn), 10),
+		Description: task.Description,
+	}
+	html.TaskEdit(taskParams, chores, users).Render(r.Context(), w)
 }
