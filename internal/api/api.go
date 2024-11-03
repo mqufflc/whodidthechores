@@ -29,6 +29,7 @@ func New(repo *repository.Repository, conf config.Config) http.Handler {
 	}
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", s.notFound)
+	mux.HandleFunc("/static/stylesheet.css", serveCSS)
 	mux.HandleFunc("/{$}", s.index)
 	mux.HandleFunc("/chores", s.chores)
 	mux.HandleFunc("/chores/{id}", s.editChore)
@@ -40,6 +41,17 @@ func New(repo *repository.Repository, conf config.Config) http.Handler {
 	mux.HandleFunc("/tasks/{id}", s.editTask)
 	mux.HandleFunc("/tasks/new", s.createTask)
 	return mux
+}
+
+func serveCSS(w http.ResponseWriter, r *http.Request) {
+	p, err := html.EmbedCSS.ReadFile("css/stylesheet.css")
+	if err != nil {
+		slog.Error(fmt.Sprintf("unable to read css file: %v", err))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "text/css")
+	w.Write(p)
 }
 
 func (h *HTTPServer) notFound(w http.ResponseWriter, r *http.Request) {
