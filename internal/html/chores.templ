@@ -9,34 +9,46 @@ import (
 
 templ choresTemplate(chores []postgres.Chore) {
 	<div id="choresList">
-		for _, chore := range chores {
-			<div id={ fmt.Sprintf("chore-%d", chore.ID) }>
-				Name: <span>{ chore.Name }</span>
-				Description: <span>{ chore.Description }</span>
-				Default Duration: <span>{ strconv.FormatInt(int64(chore.DefaultDurationMn), 10) } mn</span>
-				<p><a href={ templ.URL(fmt.Sprintf("/chores/%d", chore.ID)) }>Edit</a></p>
-			</div>
-		}
+		<table class="table table-sm table-zebra lg:table-lg">
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Description</th>
+					<th>Default Duration</th>
+				</tr>
+			</thead>
+			<tbody>
+				for _, chore := range chores {
+					<tr id={ fmt.Sprintf("chore-%d", chore.ID) }>
+						<td>{ chore.Name }</td>
+						<td>{ chore.Description }</td>
+						<td>{ strconv.FormatInt(int64(chore.DefaultDurationMn), 10) } mn</td>
+						<td><a class="btn btn-outline btn-secondary btn-xs" href={ templ.URL(fmt.Sprintf("/chores/%d", chore.ID)) }>Edit</a></td>
+					</tr>
+				}
+			</tbody>
+		</table>
 	</div>
 }
 
 templ Chores(chores []postgres.Chore) {
 	@layout("Chores") {
 		@choresTemplate(chores)
-		<p>
-			<a href="/chores/new">Add Chore</a>
-		</p>
+		<div class="flex m-4">
+			<a class="ml-auto btn btn-primary btn-sm lg:btn-md" href="/chores/new">Add a Chore</a>
+		</div>
 	}
 }
 
 templ ChoreCreate(choreParams repository.ChoreParams) {
 	@layout("Create a new Chore") {
-		<form action="/chores/new" method="post">
+		<form class="mx-2" action="/chores/new" method="post">
 			@choreFieldSet(choreParams)
+			<div class="flex m-4">
+				<a class="btn btn-sm lg:btn-md" href="/chores">Back</a>
+				<button class="ml-auto btn btn-primary btn-sm lg:btn-md">Save</button>
+			</div>
 		</form>
-		<p>
-			<a href="/chores">Back</a>
-		</p>
 	}
 }
 
@@ -44,34 +56,36 @@ templ ChoreEdit(choreParams repository.ChoreParams) {
 	@layout("Edit a Chore") {
 		<form action={ templ.URL(fmt.Sprintf("/chores/%d", choreParams.ID)) } method="PUT">
 			@choreFieldSet(choreParams)
+			<div class="flex m-4">
+				<a class="btn btn-sm lg:btn-md" href="/chores">Back</a>
+				<div class="ml-auto flex justify-between gap-4">
+					<button class="ml-auto btn btn-warning btn-sm lg:btn-md" hx-delete={ fmt.Sprintf("/chores/%d", choreParams.ID) } hx-confirm="Are you sure you want to delete this chore?">Delete</button>
+					<button class="ml-auto btn btn-primary btn-sm lg:btn-md">Save</button>
+				</div>
+			</div>
 		</form>
-		<p>
-			<button hx-delete={ fmt.Sprintf("/chores/%d", choreParams.ID) } hx-confirm="Are you sure you want to delete this chore?">Delete</button>
-		</p>
-		<p>
-			<a href="/chores">Back</a>
-		</p>
 	}
 }
 
 templ choreFieldSet(choreParams repository.ChoreParams) {
 	<fieldset>
 		<legend>Chore Values</legend>
-		<p>
-			<label class="form-control w-full max-w-xs" for="name">Name</label>
-			<input class="input input-bordered w-full max-w-xs" name="name" id="name" type="text" placeholder="Dishes" value={ choreParams.Name } required/>
-			<span class="label-text-alt">{ choreParams.Errors.Name }</span>
-		</p>
-		<p>
-			<label class="form-control w-full max-w-xs" for="description">Description</label>
-			<input class="input input-bordered w-full max-w-xs" name="description" id="description" type="text" placeholder="Washing the dishes" value={ choreParams.Description }/>
-			<span class="label-text-alt">{ choreParams.Errors.Description }</span>
-		</p>
-		<p>
-			<label class="form-control w-full max-w-xs" for="default_duration">Default Duration (mn)</label>
-			<input class="input input-bordered w-full max-w-xs" name="default_duration" id="default_duration" type="number" placeholder="15" min="0" value={ choreParams.DefaultDurationMn } required/>
-			<span class="label-text-alt">{ choreParams.Errors.DefaultDurationMn }</span>
-		</p>
-		<button>Save</button>
+		<div class="p-2 flex flex-col gap-4">
+			<p>
+				<label class="form-control w-full max-w-xs" for="name">Name</label>
+				<input class="input input-bordered w-full max-w-xs" name="name" id="name" type="text" placeholder="Dishes" value={ choreParams.Name } required/>
+				<span class="label-text-alt">{ choreParams.Errors.Name }</span>
+			</p>
+			<p>
+				<label class="form-control w-full max-w-xs" for="description">Description</label>
+				<input class="input input-bordered w-full max-w-xs" name="description" id="description" type="text" placeholder="Washing the dishes" value={ choreParams.Description }/>
+				<span class="label-text-alt">{ choreParams.Errors.Description }</span>
+			</p>
+			<p>
+				<label class="form-control w-full max-w-xs" for="default_duration">Default Duration (mn)</label>
+				<input class="input input-bordered w-full max-w-xs" name="default_duration" id="default_duration" type="number" placeholder="15" min="0" value={ choreParams.DefaultDurationMn } required/>
+				<span class="label-text-alt">{ choreParams.Errors.DefaultDurationMn }</span>
+			</p>
+		</div>
 	</fieldset>
 }
