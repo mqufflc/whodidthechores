@@ -2247,6 +2247,11 @@ html {
   line-height: 1.75rem;
 }
 
+.text-error {
+  --tw-text-opacity: 1;
+  color: var(--fallback-er,oklch(var(--er)/var(--tw-text-opacity)));
+}
+
 .placeholder-neutral-content\/50::-moz-placeholder {
   color: var(--fallback-nc,oklch(var(--nc)/0.5));
 }

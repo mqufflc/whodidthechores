@@ -78,17 +78,17 @@ templ choreFieldSet(choreParams repository.ChoreParams) {
 			<div class="form-control w-full">
 				<label class="label label-text" for="name">Name</label>
 				<input class="input input-bordered w-full placeholder-neutral-content/50" name="name" id="name" type="text" placeholder="Dishes" value={ choreParams.Name } required/>
-				<span class="label label-text-alt">{ choreParams.Errors.Name }</span>
+				<span class="label label-text-alt text-error">{ choreParams.Errors.Name }</span>
 			</div>
 			<div class="form-control w-full">
 				<label class="label label-text" for="description">Description</label>
 				<input class="input input-bordered w-full placeholder-neutral-content/50" name="description" id="description" type="text" placeholder="Washing the dishes" value={ choreParams.Description }/>
-				<span class="label label-text-alt">{ choreParams.Errors.Description }</span>
+				<span class="label label-text-alt text-error">{ choreParams.Errors.Description }</span>
 			</div>
 			<div class="form-control w-full">
 				<label class="label label-text" for="default_duration">Default Duration (mn)</label>
 				<input class="input input-bordered w-full placeholder-neutral-content/50" name="default_duration" id="default_duration" type="number" placeholder="15" min="0" value={ choreParams.DefaultDurationMn } required/>
-				<span class="label label-text-alt">{ choreParams.Errors.DefaultDurationMn }</span>
+				<span class="label label-text-alt text-error">{ choreParams.Errors.DefaultDurationMn }</span>
 			</div>
 		</div>
 	</fieldset>
