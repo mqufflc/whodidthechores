@@ -42,50 +42,54 @@ templ Chores(chores []postgres.Chore) {
 
 templ ChoreCreate(choreParams repository.ChoreParams) {
 	@layout("Create a new Chore") {
-		<form class="mx-2" action="/chores/new" method="post">
-			@choreFieldSet(choreParams)
-			<div class="flex m-4">
-				<a class="btn btn-sm lg:btn-md" href="/chores">Back</a>
-				<button class="ml-auto btn btn-primary btn-sm lg:btn-md">Save</button>
-			</div>
-		</form>
+		<div class="mx-auto w-80 sm:w-96">
+			<form action="/chores/new" method="post">
+				@choreFieldSet(choreParams)
+				<div class="flex m-4">
+					<a class="btn btn-sm lg:btn-md" href="/chores">Back</a>
+					<button class="ml-auto btn btn-primary btn-sm lg:btn-md">Save</button>
+				</div>
+			</form>
+		</div>
 	}
 }
 
 templ ChoreEdit(choreParams repository.ChoreParams) {
 	@layout("Edit a Chore") {
-		<form action={ templ.URL(fmt.Sprintf("/chores/%d", choreParams.ID)) } method="PUT">
-			@choreFieldSet(choreParams)
-			<div class="flex m-4">
-				<a class="btn btn-sm lg:btn-md" href="/chores">Back</a>
-				<div class="ml-auto flex justify-between gap-4">
-					<button class="ml-auto btn btn-warning btn-sm lg:btn-md" hx-delete={ fmt.Sprintf("/chores/%d", choreParams.ID) } hx-confirm="Are you sure you want to delete this chore?">Delete</button>
-					<button class="ml-auto btn btn-primary btn-sm lg:btn-md">Save</button>
+		<div class="mx-auto w-80 sm:w-96">
+			<form action={ templ.URL(fmt.Sprintf("/chores/%d", choreParams.ID)) } method="PUT">
+				@choreFieldSet(choreParams)
+				<div class="flex m-4">
+					<a class="btn btn-sm lg:btn-md" href="/chores">Back</a>
+					<div class="ml-auto flex justify-between gap-4">
+						<button class="ml-auto btn btn-warning btn-sm lg:btn-md" hx-delete={ fmt.Sprintf("/chores/%d", choreParams.ID) } hx-confirm="Are you sure you want to delete this chore?">Delete</button>
+						<button class="ml-auto btn btn-primary btn-sm lg:btn-md">Save</button>
+					</div>
 				</div>
-			</div>
-		</form>
+			</form>
+		</div>
 	}
 }
 
 templ choreFieldSet(choreParams repository.ChoreParams) {
 	<fieldset>
-		<legend>Chore Values</legend>
-		<div class="p-2 flex flex-col gap-4">
-			<p>
-				<label class="form-control w-full max-w-xs" for="name">Name</label>
-				<input class="input input-bordered w-full max-w-xs" name="name" id="name" type="text" placeholder="Dishes" value={ choreParams.Name } required/>
-				<span class="label-text-alt">{ choreParams.Errors.Name }</span>
-			</p>
-			<p>
-				<label class="form-control w-full max-w-xs" for="description">Description</label>
-				<input class="input input-bordered w-full max-w-xs" name="description" id="description" type="text" placeholder="Washing the dishes" value={ choreParams.Description }/>
-				<span class="label-text-alt">{ choreParams.Errors.Description }</span>
-			</p>
-			<p>
-				<label class="form-control w-full max-w-xs" for="default_duration">Default Duration (mn)</label>
-				<input class="input input-bordered w-full max-w-xs" name="default_duration" id="default_duration" type="number" placeholder="15" min="0" value={ choreParams.DefaultDurationMn } required/>
-				<span class="label-text-alt">{ choreParams.Errors.DefaultDurationMn }</span>
-			</p>
+		<legend class="text-lg">Chore Values</legend>
+		<div class="p-2 flex flex-col gap-2">
+			<div class="form-control w-full">
+				<label class="label label-text" for="name">Name</label>
+				<input class="input input-bordered w-full placeholder-neutral-content/50" name="name" id="name" type="text" placeholder="Dishes" value={ choreParams.Name } required/>
+				<span class="label label-text-alt">{ choreParams.Errors.Name }</span>
+			</div>
+			<div class="form-control w-full">
+				<label class="label label-text" for="description">Description</label>
+				<input class="input input-bordered w-full placeholder-neutral-content/50" name="description" id="description" type="text" placeholder="Washing the dishes" value={ choreParams.Description }/>
+				<span class="label label-text-alt">{ choreParams.Errors.Description }</span>
+			</div>
+			<div class="form-control w-full">
+				<label class="label label-text" for="default_duration">Default Duration (mn)</label>
+				<input class="input input-bordered w-full placeholder-neutral-content/50" name="default_duration" id="default_duration" type="number" placeholder="15" min="0" value={ choreParams.DefaultDurationMn } required/>
+				<span class="label label-text-alt">{ choreParams.Errors.DefaultDurationMn }</span>
+			</div>
 		</div>
 	</fieldset>
 }
