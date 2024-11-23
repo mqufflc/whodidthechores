@@ -25,5 +25,7 @@ node_modules
 .docker-compose
 tmp
 config.yaml
+internal/html/css/stylesheet.css
 
 .vscode
+dist/

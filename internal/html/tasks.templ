@@ -15,8 +15,8 @@ templ tasksTemplate(tasksRows []postgres.ListUsersTasksRow, timezone *time.Locat
 				<tr>
 					<th>Chore</th>
 					<th>User</th>
-					<th class="hidden md:inline">Duration</th>
-					<th class="hidden md:inline">Description</th>
+					<th class="hidden md:inline-block">Duration</th>
+					<th class="hidden md:inline-block">Description</th>
 					<th>Started At</th>
 				</tr>
 			</thead>
@@ -25,8 +25,8 @@ templ tasksTemplate(tasksRows []postgres.ListUsersTasksRow, timezone *time.Locat
 					<tr id={ fmt.Sprintf("task-%v", taskRow.Task.ID.String()) }>
 						<td>{ taskRow.Chore.Name }</td>
 						<td>{ taskRow.User.Name }</td>
-						<td class="hidden md:inline">{ strconv.FormatInt(int64(taskRow.Task.DurationMn), 10) } mn</td>
-						<td class="hidden md:inline">{ taskRow.Task.Description }</td>
+						<td class="hidden md:inline-block">{ strconv.FormatInt(int64(taskRow.Task.DurationMn), 10) } mn</td>
+						<td class="hidden md:inline-block">{ taskRow.Task.Description }</td>
 						<td>{ taskRow.Task.StartedAt.In(timezone).Format("02/01/2006 15:04") }</td>
 						<td><a class="btn btn-outline btn-secondary btn-xs" href={ templ.URL(fmt.Sprintf("/tasks/%v", taskRow.Task.ID.String())) }>Edit</a></td>
 					</tr>
