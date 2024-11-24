@@ -79,7 +79,7 @@ func New() (Config, error) {
 	viperInstance.SetEnvKeyReplacer(replacer)
 	viperInstance.AutomaticEnv()
 
-	viperInstance.SetDefault("port", 3000)
+	viperInstance.SetDefault("port", 8080)
 	viperInstance.SetDefault("timezone", "UTC")
 	viperInstance.SetDefault("database.username", "")
 	viperInstance.SetDefault("database.password", "")

@@ -8,10 +8,10 @@
 - [ ] Display creation / update errors
 - [ ] Automatically select default chore duration in task form
 - [ ] Add detailed view pages for chores and users
-- [ ] Github Action for building container
-- [ ] Dockerfile
-- [ ] Helm chart
+- [ ] Validate Helm chart
+- [ ] Validate go and docker release process
 - [ ] More Logging
+- [ ] README
 
 ### In Progress
-- [ ] Display task error in forms
+- [ ] Display task errors in forms
