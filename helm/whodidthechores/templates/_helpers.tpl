@@ -80,14 +80,3 @@ Labels to use in selectors for pg
 app.kubernetes.io/name: {{ include "whodidthechores.name" . }}-pg
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
-
-{{/*
-Helper to render a template inside a value
-*/}}
-{{- define "whodidthechores.render" -}}
-    {{- if typeIs "string" .value }}
-        {{- tpl .value .context }}
-    {{- else }}
-        {{- tpl (.value | toYaml) .context }}
-    {{- end }}
-{{- end -}}

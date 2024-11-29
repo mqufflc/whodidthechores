@@ -5,18 +5,18 @@ metadata:
   {{- if or .Values.service.annotations .Values.commonAnnotations }}
   annotations:
     {{- if .Values.service.annotations }}
-    {{- include "whodidthechores.render" (dict "value" .Values.service.annotations "context" $) | nindent 4 }}
+    {{- toYaml .Values.service.annotations | nindent 4 }}
     {{- end }}
     {{- if .Values.commonAnnotations }}
-    {{- include "whodidthechores.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+    {{- toYaml .Values.commonAnnotations | nindent 4 }}
     {{- end }}
   {{- end }}
   labels: {{- include "whodidthechores.labels" . | nindent 4 }}
     {{- if .Values.service.labels }}
-    {{- include "whodidthechores.render" ( dict "value" .Values.service.labels "context" $) | nindent 4 }}
+    {{- toYaml .Values.service.labels | nindent 4 }}
     {{- end }}
     {{- if .Values.commonLabels }}
-    {{- include "whodidthechores.render" (dict "value" .Values.commonLabels "context" $) | nindent 4 }}
+    {{- toYaml .Values.commonLabels | nindent 4 }}
     {{- end }}
 spec:
   type: {{ .Values.service.type }}

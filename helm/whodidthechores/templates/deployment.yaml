@@ -4,11 +4,11 @@ metadata:
   name: {{ include "whodidthechores.fullname" . }}
   labels: {{- include "whodidthechores.labels" . | nindent 4 }}
     {{- if .Values.commonLabels }}
-    {{- include "whodidthechores.render" (dict "value" .Values.commonLabels "context" $) | nindent 4 }}
+    {{- toYaml .Values.commonLabels | nindent 4 }}
     {{- end }}
   annotations:
     {{- if .Values.commonAnnotations }}
-    {{- include "whodidthechores.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+    {{- toYaml .Values.commonAnnotations | nindent 4 }}
     {{- end }}
 spec:
   replicas: 1
@@ -62,11 +62,11 @@ spec:
         - name: whodidthechores
           {{- if .Values.command }}
           command:
-            {{- include "whodidthechores.render" (dict "value" .Values.command "context" $) | nindent 12 }}
+            {{- toYaml .Values.command | nindent 12 }}
           {{- end }}
           {{- if .Values.args }}
           args:
-            {{- include "whodidthechores.render" (dict "value" .Values.args "context" $) | nindent 12 }}
+            {{- toYaml .Values.args | nindent 12 }}
           {{- end }}
           image: {{ printf "%s/%s:%s" .Values.image.registry .Values.image.repository .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -92,7 +92,7 @@ spec:
               hostPort: {{ .Values.hostPorts.http }}
               {{- end }}
           {{- if .Values.startupProbe.enabled }}
-          startupProbe: {{- include "whodidthechores.render" (dict "value" (omit .Values.startupProbe "enabled") "context" $) | nindent 12 }}
+          startupProbe: {{- toYaml (omit .Values.startupProbe "enabled") | nindent 12 }}
             tcpSocket:
               port: http
           {{- end }}

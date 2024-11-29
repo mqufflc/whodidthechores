@@ -5,12 +5,12 @@ metadata:
   {{- if .Values.commonAnnotations }}
   annotations:
     {{- if .Values.commonAnnotations }}
-    {{- include "whodidthechores.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+    {{- toYaml .Values.commonAnnotations | nindent 4 }}
     {{- end }}
   {{- end }}
   labels: {{- include "whodidthechores.postgresLabels" . | nindent 4 }}
     {{- if .Values.commonLabels }}
-    {{- include "whodidthechores.render" (dict "value" .Values.commonLabels "context" $) | nindent 4 }}
+    {{- toYaml .Values.commonLabels | nindent 4 }}
     {{- end }}
 spec:
   type: ClusterIP

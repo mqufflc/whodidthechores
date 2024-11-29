@@ -5,14 +5,14 @@ metadata:
   name: {{ include "whodidthechores.fullname" . }}
   labels: {{- include "whodidthechores.labels" . | nindent 4 }}
     {{- if .Values.commonLabels }}
-    {{- include "whodidthechores.render" (dict "value" .Values.commonLabels "context" $) | nindent 4 }}
+    {{- toYaml .Values.commonLabels | nindent 4 }}
     {{- end }}
   annotations:
     {{- if .Values.ingress.annotations }}
-    {{- include "whodidthechores.render" ( dict "value" .Values.ingress.annotations "context" $) | nindent 4 }}
+    {{- toYaml .Values.ingress.annotations | nindent 4 }}
     {{- end }}
     {{- if .Values.commonAnnotations }}
-    {{- include "whodidthechores.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+    {{- toYaml .Values.commonAnnotations | nindent 4 }}
     {{- end }}
 spec:
   {{- if .Values.ingress.ingressClassName }}
