@@ -1,9 +1,11 @@
 {{- if .Values.postgres.enabled }}
 {{- $secretName := .Values.secretName | default (printf "%s-pg-conn" (include "whodidthechores.fullname" .)) }}
+{{- $pvcName:= .Values.postgres.pvcName | default (printf "%s-pgdata" (include "whodidthechores.fullname" .)) }}
+{{- $host := (printf "%s-pg" (include "whodidthechores.fullname" .)) }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "whodidthechores.fullname" . }}-pg
+  name: {{ $host }}
   {{- if .Values.commonAnnotations }}
   annotations:
     {{- if .Values.commonAnnotations }}
@@ -25,11 +27,11 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "whodidthechores.fullname" . }}-pg
+  name: {{ $host }}
 spec:
   selector:
     matchLabels: {{- include "whodidthechores.postgresMatchLabels" . | nindent 6 }}
-  serviceName: {{ include "whodidthechores.fullname" . }}-pg
+  serviceName: {{ $host }}
   replicas: 1
   template:
     metadata:
@@ -61,12 +63,12 @@ spec:
         - containerPort: 5432
           name: pg
         volumeMounts:
-        - name: {{ .Values.postgres.pvcName | default (printf "%s-pgdata" (include "whodidthechores.fullname" .)) }}
+        - name: {{ $pvcName | quote }}
           mountPath: /var/lib/postgresql/data
 {{- if .Values.postgres.createPvc }}
   volumeClaimTemplates:
   - metadata:
-      name: {{ .Values.postgres.pvcName | default (printf "%s-pgdata" (include "whodidthechores.fullname" .)) }}
+      name: {{ $pvcName | quote }}
     spec:
       accessModes: [ "ReadWriteOnce" ]
       {{- if .Values.postgres.storageClassName }}
@@ -77,12 +79,11 @@ spec:
           storage: {{ .Values.postgres.storageRequest }}
 {{- else }}
   volume:
-  - name: {{ .Values.postgres.pvcName | default (printf "%s-pgdata" (include "whodidthechores.fullname" .)) }}
+  - name: {{ $pvcName | quote }}
     persistentVolumeClaim:
-      claimName: {{ .Values.postgres.pvcName | default (printf "%s-pgdata" (include "whodidthechores.fullname" .)) }}
+      claimName: {{ $pvcName | quote }}
 {{- end }}
 ---
-{{- $host := (printf "%s-pg" (include "whodidthechores.fullname" .)) }}
 {{- $port := "5432" }}
 {{- $database := "whodidthechores" }}
 {{- $username := "postgres" }}
@@ -94,7 +95,7 @@ spec:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: {{ include "whodidthechores.fullname" . }}-pg
+  name: {{ $host }}
 data:
   host: {{ $host | b64enc | quote }}
   port: {{ $port | b64enc | quote }}
