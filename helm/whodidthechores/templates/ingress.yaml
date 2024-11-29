@@ -3,7 +3,6 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ include "whodidthechores.fullname" . }}
-  namespace: {{ include "whodidthechores.namespace" . }}
   labels: {{- include "whodidthechores.labels" . | nindent 4 }}
     {{- if .Values.commonLabels }}
     {{- include "whodidthechores.render" (dict "value" .Values.commonLabels "context" $) | nindent 4 }}

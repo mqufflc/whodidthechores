@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "whodidthechores.fullname" . }}
-  namespace: {{ include "whodidthechores.namespace" . }}
   labels: {{- include "whodidthechores.labels" . | nindent 4 }}
     {{- if .Values.commonLabels }}
     {{- include "whodidthechores.render" (dict "value" .Values.commonLabels "context" $) | nindent 4 }}
@@ -17,13 +16,13 @@ spec:
   revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
   {{- end }}
   selector:
-    matchLabels: {{- include "whodidthechores.matchLabels" . | nindent 6 }}
+    matchLabels: {{- include "whodidthechores.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- if .Values.podAnnotations }}
       annotations: {{- toYaml .Values.podAnnotations | nindent 8 }}
       {{- end }}
-      labels: {{- include "whodidthechores.matchLabels" . | nindent 8 }}
+      labels: {{- include "whodidthechores.selectorLabels" . | nindent 8 }}
         {{- if .Values.podLabels }}
         {{- toYaml .Values.podLabels | nindent 8 }}
         {{- end }}

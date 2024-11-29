@@ -12,7 +12,8 @@ Who did the Chores is a web application to record and visualize who did the chor
 - [Parameters](#parameters)
   - [Common parameters](#common-parameters)
   - [Who Did The Chores Parameters](#who-did-the-chores-parameters)
-  - [Traffic Exposure Parameters](#traffic-exposure-parameters)
+  - [Postgres Parameters](#postgres-parameters)
+  - [Expose Application Parameters](#expose-application-parameters)
   - [Other Parameters](#other-parameters)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -67,7 +68,6 @@ This command removes all the components from the Kubernetes cluster and removes 
 | ------------------- | ----------------------------------------------------- | ----- |
 | `nameOverride`      | String to partially override whodidthechores.fullname | `""`  |
 | `fullnameOverride`  | String to fully override whodidthechores.fullname     | `""`  |
-| `namespace`         | Namespace where to deploy the application             | `""`  |
 | `commonAnnotations` | Annotations to add to all deployed resources          | `{}`  |
 | `commonLabels`      | Labels to add to all deployed resources               | `{}`  |
 
@@ -90,7 +90,7 @@ This command removes all the components from the Kubernetes cluster and removes 
 | `resources.limits`                                | The resources limits for the Who Did The Chores containers                                            | `{}`                      |
 | `resources.requests`                              | The requested resources for the Who Did The Chores containers                                         | `{}`                      |
 | `podSecurityContext.enabled`                      | Enabled Who Did The Chores pods' Security Context                                                     | `true`                    |
-| `podSecurityContext.fsGroup`                      | Set Who Did The Chores pod's Security Context fsGroup                                                 | `65534`                   |
+| `podSecurityContext.fsGroup`                      | Set Who Did The Chores pod's Security Context fsGroup                                                 | `1001`                    |
 | `containerSecurityContext.enabled`                | Enabled Who Did The Chores containers' Security Context                                               | `true`                    |
 | `containerSecurityContext.readOnlyRootFilesystem` | Whether the Who Did The Chores container has a read-only root filesystem                              | `true`                    |
 | `containerSecurityContext.runAsNonRoot`           | Indicates that the Who Did The Chores container must run as a non-root user                           | `true`                    |
@@ -112,7 +112,21 @@ This command removes all the components from the Kubernetes cluster and removes 
 | `hostPorts.metrics`                               | Metrics HTTP Port on the Host                                                                         | `""`                      |
 | `dnsPolicy`                                       | Who Did The Choress pods' dnsPolicy                                                                   | `""`                      |
 
-### Traffic Exposure Parameters
+### Postgres Parameters
+
+| Name                                    | Description                                                                                             | Value  |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------- | ------ |
+| `postgres.enabled`                      | Wether to deploy a postgresql statefulset with Who Did The Chores deployment                            | `true` |
+| `postgres.createPvc`                    | Wether to create a pvc for postgres data                                                                | `true` |
+| `postgres.pvcName`                      | The name of the pvc for postgres statefulset that will be created or the name of an existing pvc to use | `""`   |
+| `postgres.storageClassName`             | The Storage Class Name to use for the PVC                                                               | `""`   |
+| `postgres.storageRequest`               | The storage request for the pvc                                                                         | `10Gi` |
+| `postgres.annotations`                  | Additional custom annotations for postgres statefulset                                                  | `{}`   |
+| `postgres.podSecurityContext.enabled`   | Enabled postgres' Security Context                                                                      | `true` |
+| `postgres.podSecurityContext.fsGroup`   | Set postgres pod's Security Context fsGroup                                                             | `1001` |
+| `postgres.podSecurityContext.runAsUser` | Set postgres pod's Security Context runAsUser                                                           | `1001` |
+
+### Expose Application Parameters
 
 | Name                        | Description                                                                                                                      | Value                    |
 | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | ------------------------ |

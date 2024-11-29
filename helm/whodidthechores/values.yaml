@@ -6,9 +6,6 @@ nameOverride: ""
 ## @param fullnameOverride String to fully override whodidthechores.fullname
 ##
 fullnameOverride: ""
-## @param namespace Namespace where to deploy the application
-##
-namespace: ""
 
 ## @param commonAnnotations [object] Annotations to add to all deployed resources
 ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
@@ -79,7 +76,7 @@ resources:
 ##
 podSecurityContext:
   enabled: true
-  fsGroup: 65534
+  fsGroup: 1001
 ## Configure Container Security Context
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
 ## @param containerSecurityContext.enabled Enabled Who Did The Chores containers' Security Context
@@ -153,7 +150,41 @@ hostPorts:
 
 ## @param dnsPolicy Who Did The Choress pods' dnsPolicy
 dnsPolicy: ""
-## @section Traffic Exposure Parameters
+## @section Postgres Parameters
+
+## Who Did The Chores postgres parameters
+##
+postgres:
+  ## @param postgres.enabled Wether to deploy a postgresql statefulset with Who Did The Chores deployment
+  ##
+  enabled: true
+  ## @param postgres.createPvc Wether to create a pvc for postgres data
+  ##
+  createPvc: true
+  ## @param postgres.pvcName The name of the pvc for postgres statefulset that will be created or the name of an existing pvc to use
+  ## default to {{ include "whodidthechores.fullname" . }}-pgdata 
+  pvcName: ""
+  ## @param postgres.storageClassName The Storage Class Name to use for the PVC
+  ## Ignored when createPvc: false
+  storageClassName: ""
+  ## @param postgres.storageRequest The storage request for the pvc
+  ## Ignored when createPvc: false
+  storageRequest: 10Gi
+  ## @param postgres.annotations [object] Additional custom annotations for postgres statefulset
+  ##
+  annotations: {}
+  ## Configure Pods Security Context for postgres
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+  ## @param postgres.podSecurityContext.enabled Enabled postgres' Security Context
+  ## @param postgres.podSecurityContext.fsGroup Set postgres pod's Security Context fsGroup
+  ## @param postgres.podSecurityContext.runAsUser Set postgres pod's Security Context runAsUser
+  ##
+  podSecurityContext:
+    enabled: true
+    fsGroup: 1001
+    runAsUser: 1001
+
+## @section Expose Application Parameters
 
 ## Who Did The Chores service parameters
 ##

@@ -1,0 +1,72 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "whodidthechores.fullname" . }}-pg
+  {{- if .Values.commonAnnotations }}
+  annotations:
+    {{- if .Values.commonAnnotations }}
+    {{- include "whodidthechores.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+    {{- end }}
+  {{- end }}
+  labels: {{- include "whodidthechores.postgresLabels" . | nindent 4 }}
+    {{- if .Values.commonLabels }}
+    {{- include "whodidthechores.render" (dict "value" .Values.commonLabels "context" $) | nindent 4 }}
+    {{- end }}
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5432
+    name: pg
+  clusterIP: None
+  selector: {{- include "whodidthechores.postgresMatchLabels" . | nindent 4 }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "whodidthechores.fullname" . }}-pg
+spec:
+  selector:
+    matchLabels: {{- include "whodidthechores.postgresMatchLabels" . | nindent 6 }}
+  serviceName: {{ include "whodidthechores.fullname" . }}-pg
+  replicas: 1
+  template:
+    metadata:
+      labels: {{- include "whodidthechores.postgresMatchLabels" . | nindent 8 }}
+    spec:
+      {{- if .Values.postgres.podSecurityContext.enabled }}
+      securityContext: {{- omit .Values.postgres.podSecurityContext "enabled" | toYaml | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: postgres
+        image: postgres:15.10-bookworm
+        ports:
+        - containerPort: 5432
+          name: pg
+        volumeMounts:
+        - name: {{ .Values.postgres.pvcName | default (printf "%s-pgdata" (include "whodidthechores.fullname" .)) }}
+          mountPath: /var/lib/postgresql/data
+{{- if .Values.postgres.createPvc }}
+  volumeClaimTemplates:
+  - metadata:
+      name: {{ .Values.postgres.pvcName | default (printf "%s-pgdata" (include "whodidthechores.fullname" .)) }}
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      {{- if .Values.postgres.storageClassName }}
+      storageClassName: {{ .Values.postgres.storageClassName | quote }}
+      {{- end }}
+      resources:
+        requests:
+          storage: {{ .Values.postgres.storageRequest }}
+{{- else }}
+  volume:
+  - name: {{ .Values.postgres.pvcName | default (printf "%s-pgdata" (include "whodidthechores.fullname" .)) }}
+    persistentVolumeClaim:
+      claimName: {{ .Values.postgres.pvcName | default (printf "%s-pgdata" (include "whodidthechores.fullname" .)) }}
+{{- end }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "whodidthechores.fullname" . }}-pg
+data:
+  password: "c1ZwYm90R2d4Nw=="
