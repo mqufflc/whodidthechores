@@ -1,3 +1,5 @@
+{{- if .Values.postgres.enabled }}
+{{- $secretName := .Values.secretName | default (printf "%s-pg-conn" (include "whodidthechores.fullname" .)) }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -39,6 +41,22 @@ spec:
       containers:
       - name: postgres
         image: postgres:15.10-bookworm
+        env:
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: {{ $secretName | quote }}
+              key: "username"
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ $secretName | quote }}
+              key: "password"
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: {{ $secretName | quote }}
+              key: "database"
         ports:
         - containerPort: 5432
           name: pg
@@ -64,9 +82,23 @@ spec:
       claimName: {{ .Values.postgres.pvcName | default (printf "%s-pgdata" (include "whodidthechores.fullname" .)) }}
 {{- end }}
 ---
+{{- $host := (printf "%s-pg" (include "whodidthechores.fullname" .)) }}
+{{- $port := "5432" }}
+{{- $database := "whodidthechores" }}
+{{- $username := "postgres" }}
+{{- $existingSecret := lookup "v1" "Secret" .Release.Namespace $secretName }}
+{{- $password := randAlphaNum 20 }}
+{{- if $existingSecret }}
+{{- $password := $existingSecret.data.password | b64dec }}
+{{- end }}
 apiVersion: v1
 kind: Secret
 metadata:
   name: {{ include "whodidthechores.fullname" . }}-pg
 data:
-  password: "c1ZwYm90R2d4Nw=="
+  host: {{ $host | b64enc | quote }}
+  port: {{ $port | b64enc | quote }}
+  database: {{ $database | b64enc | quote }}
+  username: {{ $username | b64enc | quote }}
+  password: {{ $password | b64enc | quote }}
+{{- end }}

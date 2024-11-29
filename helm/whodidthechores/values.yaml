@@ -155,6 +155,8 @@ dnsPolicy: ""
 ## Who Did The Chores postgres parameters
 ##
 postgres:
+  ## @param postgres.secretName The secret name that will store the postgres connection info (host, port, db, username, password)
+  secretName: ""
   ## @param postgres.enabled Wether to deploy a postgresql statefulset with Who Did The Chores deployment
   ##
   enabled: true
