@@ -45,8 +45,8 @@ type Config struct {
 }
 
 func (c *Config) Validate() error {
-	if c.Port < 1024 || c.Port > 5000 {
-		return errors.New("application port must be between 1024 and 5000")
+	if c.Port < 1024 || c.Port > 65_535 {
+		return errors.New("application port must be between 1024 and 65 535")
 	}
 	if err := c.Database.Validate(); err != nil {
 		return err
