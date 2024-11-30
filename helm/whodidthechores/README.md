@@ -77,7 +77,7 @@ This command removes all the components from the Kubernetes cluster and removes 
 | ------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | ------------------------- |
 | `image.registry`                                  | Who Did The Chores image registry                                                                     | `docker.io`               |
 | `image.repository`                                | Who Did The Chores image repository                                                                   | `mqufflc/whodidthechores` |
-| `image.tag`                                       | Who Did The Chores image tag                                                                          | `0.2.0`                   |
+| `image.tag`                                       | Who Did The Chores image tag                                                                          | `v0.2.1-amd64`            |
 | `image.pullPolicy`                                | Who Did The Chores image pull policy                                                                  | `IfNotPresent`            |
 | `image.pullSecrets`                               | Who Did The Chores image pull secrets                                                                 | `[]`                      |
 | `revisionHistoryLimit`                            | Number of old history to retain to allow rollback (If not set, default Kubernetes value is set to 10) | `""`                      |
@@ -116,6 +116,7 @@ This command removes all the components from the Kubernetes cluster and removes 
 
 | Name                                    | Description                                                                                             | Value  |
 | --------------------------------------- | ------------------------------------------------------------------------------------------------------- | ------ |
+| `postgres.secretName`                   | The secret name that will store the postgres connection info (host, port, db, username, password)       | `""`   |
 | `postgres.enabled`                      | Wether to deploy a postgresql statefulset with Who Did The Chores deployment                            | `true` |
 | `postgres.createPvc`                    | Wether to create a pvc for postgres data                                                                | `true` |
 | `postgres.pvcName`                      | The name of the pvc for postgres statefulset that will be created or the name of an existing pvc to use | `""`   |
@@ -137,7 +138,6 @@ This command removes all the components from the Kubernetes cluster and removes 
 | `service.annotations`       | Additional custom annotations for Who Did The Chores service                                                                     | `{}`                     |
 | `ingress.enabled`           | Enable ingress record generation for Who Did The Chores                                                                          | `false`                  |
 | `ingress.pathType`          | Ingress path type                                                                                                                | `ImplementationSpecific` |
-| `ingress.apiVersion`        | Force Ingress API version (automatically detected if not set)                                                                    | `""`                     |
 | `ingress.ingressClassName`  | IngressClass that will be be used to implement the Ingress                                                                       | `""`                     |
 | `ingress.hostname`          | Default host for the ingress record                                                                                              | `whodidthechores.local`  |
 | `ingress.path`              | Default path for the ingress record                                                                                              | `/`                      |
