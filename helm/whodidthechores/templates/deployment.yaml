@@ -1,3 +1,4 @@
+{{- $secretName := .Values.secretName | default (printf "%s-pg-conn" (include "whodidthechores.fullname" .)) }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -83,6 +84,35 @@ spec:
                 resourceFieldRef:
                   resource: limits.memory
             {{- end }}
+            - name: WDTC_DATABASE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $secretName | quote }}
+                  key: "username"
+            - name: WDTC_DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $secretName | quote }}
+                  key: "password"
+            - name: WDTC_DATABASE_HOSTNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $secretName | quote }}
+                  key: "host"
+            - name: WDTC_DATABASE_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $secretName | quote }}
+                  key: "port"
+            - name: WDTC_DATABASE_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $secretName | quote }}
+                  key: "database"
+            - name: WDTC_PORT
+              value: {{ .Values.containerPorts.http | default "8080" }}
+            - name: WDTC_TIMEZONE
+              value: "UTC"
           ports:
             - name: http
               containerPort: {{ .Values.containerPorts.http | default "8080" }}
