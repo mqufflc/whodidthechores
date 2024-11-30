@@ -1,0 +1,270 @@
+## @section Common parameters
+
+## @param nameOverride String to partially override whodidthechores.fullname
+##
+nameOverride: ""
+## @param fullnameOverride String to fully override whodidthechores.fullname
+##
+fullnameOverride: ""
+
+## @param commonAnnotations [object] Annotations to add to all deployed resources
+## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+##
+commonAnnotations: {}
+
+## @param commonLabels [object] Labels to add to all deployed resources
+## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+## 
+commonLabels: {}
+
+## @section Who Did The Chores Parameters
+
+## Who Did The Chores image
+## ref: https://hub.docker.com/r/mqufflc/whodidthechores/tags
+## @param image.registry Who Did The Chores image registry
+## @param image.repository Who Did The Chores image repository
+## @param image.tag Who Did The Chores image tag
+## @param image.pullPolicy Who Did The Chores image pull policy
+## @param image.pullSecrets [array]  Who Did The Chores image pull secrets
+##
+image:
+  registry: docker.io
+  repository: mqufflc/whodidthechores
+  tag: v0.2.1-amd64
+  ## Specify a imagePullPolicy
+  ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
+  ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+  ##
+  pullPolicy: IfNotPresent
+  ## Optionally specify an array of imagePullSecrets.
+  ## Secrets must be manually created in the namespace.
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  ## e.g:
+  ## pullSecrets:
+  ##   - myRegistryKeySecretName
+  ##
+  pullSecrets: []
+## @param revisionHistoryLimit Number of old history to retain to allow rollback (If not set, default Kubernetes value is set to 10)
+## e.g:
+revisionHistoryLimit: ""
+## @param startupProbe.enabled Enable startupProbe on Who Did The Chores containers
+## @param startupProbe.initialDelaySeconds Initial delay seconds for startupProbe
+## @param startupProbe.periodSeconds Period seconds for startupProbe
+## @param startupProbe.timeoutSeconds Timeout seconds for startupProbe
+## @param startupProbe.failureThreshold Failure threshold for startupProbe
+## @param startupProbe.successThreshold Success threshold for startupProbe
+##
+startupProbe:
+  enabled: false
+  initialDelaySeconds: 0
+  periodSeconds: 10
+  timeoutSeconds: 1
+  failureThreshold: 3
+  successThreshold: 1
+## Who Did The Chores resource requests and limits
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+## @param resources.limits [object] The resources limits for the Who Did The Chores containers
+## @param resources.requests [object] The requested resources for the Who Did The Chores containers
+##
+resources:
+  limits: {}
+  requests: {}
+## Configure Pods Security Context
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+## @param podSecurityContext.enabled Enabled Who Did The Chores pods' Security Context
+## @param podSecurityContext.fsGroup Set Who Did The Chores pod's Security Context fsGroup
+##
+podSecurityContext:
+  enabled: true
+  fsGroup: 1001
+## Configure Container Security Context
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+## @param containerSecurityContext.enabled Enabled Who Did The Chores containers' Security Context
+## @param containerSecurityContext.readOnlyRootFilesystem Whether the Who Did The Chores container has a read-only root filesystem
+## @param containerSecurityContext.runAsNonRoot Indicates that the Who Did The Chores container must run as a non-root user
+## @param containerSecurityContext.runAsUser Set Who Did The Chores containers' Security Context runAsUser
+## @extra containerSecurityContext.capabilities Adds and removes POSIX capabilities from running containers (see `values.yaml`)
+## @skip  containerSecurityContext.capabilities.drop
+##
+containerSecurityContext:
+  enabled: true
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1001
+  capabilities:
+    drop:
+      - ALL
+
+## @param podLabels [object] Extra labels for Who Did The Chores pods
+## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+##
+podLabels: {}
+## @param podAnnotations [object] Annotations for Who Did The Chores pods
+## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+##
+podAnnotations: {}
+## @param priorityClassName Who Did The Chores pods' priorityClassName
+##
+priorityClassName: ""
+## @param runtimeClassName Who Did The Chores pods' runtimeClassName
+##
+runtimeClassName: ""
+## @param affinity [object] Affinity for Who Did The Chores pods assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+##
+affinity: {}
+## @param nodeSelector [object] Node labels for Who Did The Chores pods assignment
+## ref: https://kubernetes.io/docs/user-guide/node-selection/
+##
+nodeSelector: {}
+## @param tolerations [array] Tolerations for Who Did The Chores pods assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+##
+tolerations: []
+## @param additionalVolumes [object] Extra Volumes for the Who Did The Chores Deployment
+## ref: https://kubernetes.io/docs/concepts/storage/volumes/
+##
+additionalVolumes: []
+## @param additionalVolumeMounts [object] Extra volumeMounts for the Who Did The Chores container
+## ref: https://kubernetes.io/docs/concepts/storage/volumes/
+##
+additionalVolumeMounts: []
+## @param hostNetwork Who Did The Chores pods' hostNetwork
+hostNetwork: false
+## Who Did The Chores ports to open
+## If hostNetwork true: the hostPort is set identical to the containerPort
+## @param containerPorts.http HTTP Port on the Host and Container
+## @param containerPorts.metrics Metrics HTTP Port on the Host and Container
+##
+containerPorts:
+  http: 8080
+  metrics: 8081
+## Who Did The Chores ports to be exposed as hostPort
+## If hostNetwork is false, only the ports specified here will be exposed (or not if set to an empty string)
+## @param hostPorts.http HTTP Port on the Host
+## @param hostPorts.metrics Metrics HTTP Port on the Host
+##
+hostPorts:
+  http: ""
+  metrics: ""
+
+## @param dnsPolicy Who Did The Choress pods' dnsPolicy
+dnsPolicy: ""
+## @section Postgres Parameters
+
+## Who Did The Chores postgres parameters
+##
+postgres:
+  ## @param postgres.secretName The secret name that will store the postgres connection info (host, port, db, username, password)
+  secretName: ""
+  ## @param postgres.enabled Wether to deploy a postgresql statefulset with Who Did The Chores deployment
+  ##
+  enabled: true
+  ## @param postgres.createPvc Wether to create a pvc for postgres data
+  ##
+  createPvc: true
+  ## @param postgres.pvcName The name of the pvc for postgres statefulset that will be created or the name of an existing pvc to use
+  ## default to {{ include "whodidthechores.fullname" . }}-pgdata 
+  pvcName: ""
+  ## @param postgres.storageClassName The Storage Class Name to use for the PVC
+  ## Ignored when createPvc: false
+  storageClassName: ""
+  ## @param postgres.storageRequest The storage request for the pvc
+  ## Ignored when createPvc: false
+  storageRequest: 10Gi
+  ## @param postgres.annotations [object] Additional custom annotations for postgres statefulset
+  ##
+  annotations: {}
+  ## Configure Pods Security Context for postgres
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+  ## @param postgres.podSecurityContext.enabled Enabled postgres' Security Context
+  ## @param postgres.podSecurityContext.fsGroup Set postgres pod's Security Context fsGroup
+  ## @param postgres.podSecurityContext.runAsUser Set postgres pod's Security Context runAsUser
+  ##
+  podSecurityContext:
+    enabled: true
+    fsGroup: 1001
+    runAsUser: 1001
+
+## @section Expose Application Parameters
+
+## Who Did The Chores service parameters
+##
+service:
+  ## @param service.type Who Did The Chores service type
+  ##
+  type: ClusterIP
+  ## @param service.loadBalancerClass Who Did The Chores service loadBalancerClass
+  ##
+  loadBalancerClass: ""
+  ## @param service.port Who Did The Chores service HTTP port
+  ##
+  port: 8080
+  ## @param service.nodePort Node port for HTTP
+  ## Specify the nodePort value for the LoadBalancer and NodePort service types
+  ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-nodeport
+  ## NOTE: choose port between <30000-32767>
+  ##
+  nodePort: ""
+  ## @param service.annotations [object] Additional custom annotations for Who Did The Chores service
+  ##
+  annotations: {}
+## Who Did The Chores ingress parameters
+## ref: http://kubernetes.io/docs/user-guide/ingress/
+##
+ingress:
+  ## @param ingress.enabled Enable ingress record generation for Who Did The Chores
+  ##
+  enabled: false
+  ## @param ingress.pathType Ingress path type
+  ##
+  pathType: ImplementationSpecific
+  ## @param ingress.ingressClassName IngressClass that will be be used to implement the Ingress
+  ##
+  ingressClassName: ""
+  ## @param ingress.hostname Default host for the ingress record
+  ##
+  hostname: whodidthechores.local
+  ## @param ingress.path Default path for the ingress record
+  ##
+  path: /
+  ## @param ingress.annotations [object] Additional annotations for the Ingress resource. To enable certificate autogeneration, place here your cert-manager annotations.
+  ## Use this parameter to set the required annotations for cert-manager, see
+  ## ref: https://cert-manager.io/docs/usage/ingress/#supported-annotations
+  ## e.g:
+  ## annotations:
+  ##   kubernetes.io/ingress.class: nginx
+  ##   cert-manager.io/cluster-issuer: cluster-issuer-name
+  ##
+  annotations: {}
+  ## @param ingress.tls Enable TLS configuration for the host defined at `ingress.hostname` parameter
+  ## TLS certificates will be retrieved from a TLS secret with name defined at `ingress.secretName`
+  ## You can:
+  ##   - Relay on cert-manager to create it by setting the corresponding annotations
+  ##   - Provide a tls secret yourself and set its name to `ingress.secretName`
+  ##
+  tls: false
+  ## @param ingress.secretName
+  ## Name of the secret containing the certificate used to expose whodidthechores.
+  secretName: ""
+
+
+## @section Other Parameters
+
+## ServiceAccount configuration
+##
+serviceAccount:
+  ## @param serviceAccount.annotations [object] Annotations for Who Did The Chores service account
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  ##
+  annotations: {}
+  ## @param serviceAccount.create Specifies whether a ServiceAccount should be created
+  ##
+  create: true
+  ## @param serviceAccount.labels Extra labels to be added to the ServiceAccount
+  ##
+  labels: {}
+  ## @param serviceAccount.name The name of the ServiceAccount to use.
+  ## If not set and create is true, a name is generated using the whodidthechores.fullname template
+  ##
+  name: ""
