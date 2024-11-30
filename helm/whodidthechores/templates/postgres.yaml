@@ -21,7 +21,6 @@ spec:
   ports:
   - port: 5432
     name: pg
-  clusterIP: None
   selector: {{- include "whodidthechores.postgresMatchLabels" . | nindent 4 }}
 ---
 apiVersion: apps/v1
@@ -90,7 +89,7 @@ spec:
 {{- $existingSecret := lookup "v1" "Secret" .Release.Namespace $secretName }}
 {{- $password := randAlphaNum 20 }}
 {{- if $existingSecret }}
-{{- $password := $existingSecret.data.password | b64dec }}
+{{- $password = $existingSecret.data.password | b64dec }}
 {{- end }}
 apiVersion: v1
 kind: Secret

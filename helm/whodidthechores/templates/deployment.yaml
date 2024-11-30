@@ -110,12 +110,12 @@ spec:
                   name: {{ $secretName | quote }}
                   key: "database"
             - name: WDTC_PORT
-              value: {{ .Values.containerPorts.http | default "8080" }}
+              value: {{ .Values.containerPorts.http | quote}}
             - name: WDTC_TIMEZONE
               value: "UTC"
           ports:
             - name: http
-              containerPort: {{ .Values.containerPorts.http | default "8080" }}
+              containerPort: {{ .Values.containerPorts.http }}
               {{- if .Values.hostNetwork }}
               hostPort: {{ .Values.containerPorts.http }}
               {{- else if .Values.hostPorts.http }}
