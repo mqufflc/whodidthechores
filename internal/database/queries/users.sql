@@ -1,6 +1,6 @@
 -- name: ListUsers :many
 SELECT * FROM users
-ORDER BY id;
+ORDER BY name;
 
 -- name: GetUser :one
 SELECT * FROM users

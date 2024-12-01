@@ -1,6 +1,6 @@
 -- name: ListChores :many
 SELECT * FROM chores
-ORDER BY id;
+ORDER BY name;
 
 -- name: GetChore :one
 SELECT * FROM chores

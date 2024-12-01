@@ -49,7 +49,7 @@ func (q *Queries) GetUser(ctx context.Context, id int32) (User, error) {
 
 const listUsers = `-- name: ListUsers :many
 SELECT id, name FROM users
-ORDER BY id
+ORDER BY name
 `
 
 func (q *Queries) ListUsers(ctx context.Context) ([]User, error) {

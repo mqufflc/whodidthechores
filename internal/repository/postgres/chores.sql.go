@@ -65,7 +65,7 @@ func (q *Queries) GetChore(ctx context.Context, id int32) (Chore, error) {
 
 const listChores = `-- name: ListChores :many
 SELECT id, name, description, default_duration_mn FROM chores
-ORDER BY id
+ORDER BY name
 `
 
 func (q *Queries) ListChores(ctx context.Context) ([]Chore, error) {
