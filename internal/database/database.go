@@ -54,7 +54,7 @@ func checkDatabaseConnectiviy(connString string) error {
 
 func Migrate(connString string) error {
 	slog.Info("checking database connectivity")
-	r := retry(checkDatabaseConnectiviy, 3, 10*time.Second)
+	r := retry(checkDatabaseConnectiviy, 30, 10*time.Second)
 	err := r(connString)
 	if err != nil {
 		return fmt.Errorf("all attempts to connect to database failed: %w", err)

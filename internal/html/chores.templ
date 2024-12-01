@@ -23,7 +23,7 @@ templ choresTemplate(chores []postgres.Chore) {
 						<td>{ chore.Name }</td>
 						<td>{ chore.Description }</td>
 						<td>{ strconv.FormatInt(int64(chore.DefaultDurationMn), 10) } mn</td>
-						<td><a class="btn btn-outline btn-secondary btn-xs" href={ templ.URL(fmt.Sprintf("/chores/%d", chore.ID)) }>Edit</a></td>
+						<td><a class="btn btn-outline btn-accent btn-xs" href={ templ.URL(fmt.Sprintf("/chores/%d", chore.ID)) }>Edit</a></td>
 					</tr>
 				}
 			</tbody>

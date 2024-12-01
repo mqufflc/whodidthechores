@@ -28,7 +28,7 @@ templ tasksTemplate(tasksRows []postgres.ListUsersTasksRow, timezone *time.Locat
 						<td class="hidden md:inline-block">{ strconv.FormatInt(int64(taskRow.Task.DurationMn), 10) } mn</td>
 						<td class="hidden md:inline-block">{ taskRow.Task.Description }</td>
 						<td>{ taskRow.Task.StartedAt.In(timezone).Format("02/01/2006 15:04") }</td>
-						<td><a class="btn btn-outline btn-secondary btn-xs" href={ templ.URL(fmt.Sprintf("/tasks/%v", taskRow.Task.ID.String())) }>Edit</a></td>
+						<td><a class="btn btn-outline btn-accent btn-xs" href={ templ.URL(fmt.Sprintf("/tasks/%v", taskRow.Task.ID.String())) }>Edit</a></td>
 					</tr>
 				}
 			</tbody>

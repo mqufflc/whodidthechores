@@ -18,7 +18,7 @@ templ usersTemplate(users []postgres.User) {
 				for _, user := range users {
 					<tr id={ fmt.Sprintf("user-%d", user.ID) }>
 						<td>{ user.Name }</td>
-						<td><a class="btn btn-outline btn-secondary btn-xs" href={ templ.URL(fmt.Sprintf("/users/%d", user.ID)) }>Edit</a></td>
+						<td><a class="btn btn-outline btn-accent btn-xs" href={ templ.URL(fmt.Sprintf("/users/%d", user.ID)) }>Edit</a></td>
 					</tr>
 				}
 			</tbody>
