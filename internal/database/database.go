@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/url"
+	"time"
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/pgx/v5"
@@ -19,7 +20,46 @@ import (
 //go:embed migrations/*.sql
 var embedMigrations embed.FS
 
+type Effector func(str string) error
+
+func retry(effector Effector, retries int, delay time.Duration) Effector {
+	return func(str string) error {
+		for r := 0; ; r++ {
+			err := effector(str)
+			if err == nil || r >= retries {
+				return err
+			}
+			slog.Warn(fmt.Sprintf("Attempt %d failed; retrying in %v", r+1, delay))
+			<-time.After(delay)
+		}
+	}
+}
+
+func checkDatabaseConnectiviy(connString string) error {
+	db, err := sql.Open("pgx", connString)
+	if err != nil {
+		return fmt.Errorf("unable to create database connection: %w", err)
+	}
+	err = db.Ping()
+	if err != nil {
+		return fmt.Errorf("connectivity test error: %w", err)
+	}
+	err = db.Close()
+	if err != nil {
+		slog.Error("unable to close connection after database connectiviy test")
+		return err
+	}
+	return nil
+}
+
 func Migrate(connString string) error {
+	slog.Info("checking database connectivity")
+	r := retry(checkDatabaseConnectiviy, 3, 10*time.Second)
+	err := r(connString)
+	if err != nil {
+		return fmt.Errorf("all attempts to connect to database failed: %w", err)
+	}
+	slog.Info("applying migrations")
 	db, err := sql.Open("pgx", connString)
 	if err != nil {
 		return fmt.Errorf("unable to connect to database before migrations: %w", err)
