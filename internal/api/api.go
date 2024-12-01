@@ -29,7 +29,7 @@ func New(repo *repository.Repository, conf config.Config) http.Handler {
 	}
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", s.notFound)
-	mux.HandleFunc("/static/stylesheet.css", serveCSS)
+	mux.HandleFunc("/static/{fileName}", serveStatic)
 	mux.HandleFunc("/{$}", s.index)
 	mux.HandleFunc("/chores", s.chores)
 	mux.HandleFunc("/chores/{id}", s.editChore)
@@ -43,10 +43,15 @@ func New(repo *repository.Repository, conf config.Config) http.Handler {
 	return mux
 }
 
-func serveCSS(w http.ResponseWriter, r *http.Request) {
-	p, err := html.EmbedCSS.ReadFile("css/stylesheet.css")
+func serveStatic(w http.ResponseWriter, r *http.Request) {
+	fileName := r.PathValue("fileName")
+	if fileName == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	p, err := html.EmbedStatic.ReadFile(fmt.Sprintf("static/%s", fileName))
 	if err != nil {
-		slog.Error(fmt.Sprintf("unable to read css file: %v", err))
+		slog.Error(fmt.Sprintf("unable to read static file: %v", err))
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
