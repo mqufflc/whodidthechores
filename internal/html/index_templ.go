@@ -134,7 +134,7 @@ func Index(reports []repository.ChoreReport) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("   <script>\n\t\t\tconst ctx = document.getElementById('myChart');\n\n\t\t\tnew Chart(ctx, {\n\t\t\t\ttype: 'bar',\n\t\t\t\tdata: {\n\t\t\t\tlabels: ['Mathilde', 'Matthieu'],\n\t\t\t\tdatasets: [\n\t\t\t\t\t{\n\t\t\t\t\t\tlabel: 'Courses',\n\t\t\t\t\t\tdata: [12, 19],\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\tlabel: 'Vaisselle',\n\t\t\t\t\t\tdata: [5,6],\n\t\t\t\t\t},\n\t\t\t\t]\n\t\t\t\t},\n\t\t\t\toptions: {\n\t\t\t\t\tscales: {\n\t\t\t\t\t\tx: {\n        \t\t\t\t\tstacked: true,\n      \t\t\t\t\t},\n\t\t\t\t\t\ty: {\n\t\t\t\t\t\t\tstacked: true\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t});\n\t\t</script>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("   <script>\n\t\t\tvar ctx = document.getElementById('myChart');\n\n\t\t\tnew Chart(ctx, {\n\t\t\t\ttype: 'bar',\n\t\t\t\tdata: {\n\t\t\t\tlabels: ['Mathilde', 'Matthieu'],\n\t\t\t\tdatasets: [\n\t\t\t\t\t{\n\t\t\t\t\t\tlabel: 'Courses',\n\t\t\t\t\t\tdata: [12, 19],\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\tlabel: 'Vaisselle',\n\t\t\t\t\t\tdata: [5,6],\n\t\t\t\t\t},\n\t\t\t\t]\n\t\t\t\t},\n\t\t\t\toptions: {\n\t\t\t\t\tscales: {\n\t\t\t\t\t\tx: {\n        \t\t\t\t\tstacked: true,\n      \t\t\t\t\t},\n\t\t\t\t\t\ty: {\n\t\t\t\t\t\t\tstacked: true\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t});\n\t\t</script>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

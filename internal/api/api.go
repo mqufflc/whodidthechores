@@ -55,7 +55,12 @@ func serveStatic(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	w.Header().Set("Content-Type", "text/css")
+	if strings.HasSuffix(fileName, ".js") {
+		w.Header().Set("Content-Type", "text/javascript")
+	}
+	if strings.HasSuffix(fileName, ".css") {
+		w.Header().Set("Content-Type", "text/css")
+	}
 	w.Write(p)
 }
 

@@ -67,7 +67,7 @@ templ Index(reports []repository.ChoreReport) {
 		// <script>const data = JSON.parse(document.getElementById('reports').textContent);
 		// console.log(data);</script>
 		<script>
-			const ctx = document.getElementById('myChart');
+			var ctx = document.getElementById('myChart');
 
 			new Chart(ctx, {
 				type: 'bar',
