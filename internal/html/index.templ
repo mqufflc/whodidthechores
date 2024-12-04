@@ -50,49 +50,69 @@ templ layout(title string) {
 			<script src="/static/htmx-2.0.3.js"></script>
 			<link href="/static/stylesheet.css" rel="stylesheet"/>
 		</head>
-		<body hx-boost="true">
+		<body hx-boost="true" class="h-screen flex flex-col">
 			@navTemplate()
-			{ children... }
+			<div class="flex-grow">
+				{ children... }
+			</div>
 		</body>
 	</html>
 }
 
-templ Index(reports []repository.ChoreReport) {
+templ Index(report repository.Report) {
 	@layout("Who Did The Chores") {
-		<div>
+		<div class="w-full h-full relative">
 			<canvas id="myChart"></canvas>
 		</div>
 		<script src="/static/chart-4.4.1.js"></script>
-		@templ.JSONScript("reports", reports)
-		// <script>const data = JSON.parse(document.getElementById('reports').textContent);
-		// console.log(data);</script>
+		@templ.JSONScript("report", report)
 		<script>
+		var createDataSet = (report) => {
+			var datasets = []
+			for (const chore of report.chores) {
+				var dataset = {}
+				dataset["label"] = chore
+				dataset["data"] = []
+				for (const user of report.users) {
+					var reportData = report.report[chore][user]
+					if (reportData) {
+						dataset["data"].push(reportData)
+					} else {
+						dataset["data"].push(0)
+					}
+				}
+				datasets.push(dataset)
+			}
+			return datasets
+		}
 			var ctx = document.getElementById('myChart');
+			var data = JSON.parse(document.getElementById('report').textContent);
 
 			new Chart(ctx, {
 				type: 'bar',
 				data: {
-				labels: ['Mathilde', 'Matthieu'],
-				datasets: [
-					{
-						label: 'Courses',
-						data: [12, 19],
-					},
-					{
-						label: 'Vaisselle',
-						data: [5,6],
-					},
-				]
+				labels: data.users,
+				datasets: createDataSet(data)
 				},
 				options: {
+					maintainAspectRatio: false,
 					scales: {
 						x: {
         					stacked: true,
       					},
 						y: {
-							stacked: true
+							stacked: true,
 						}
-					}
+					},
+					layout: {
+            			padding: 20,
+       		 		},
+					plugins: {
+						legend: {
+							display: true,
+							position: 'bottom',
+						},
+					},
 				}
 			});
 		</script>

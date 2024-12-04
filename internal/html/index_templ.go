@@ -73,7 +73,7 @@ func layout(title string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</title><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><script src=\"/static/htmx-2.0.3.js\"></script><link href=\"/static/stylesheet.css\" rel=\"stylesheet\"></head><body hx-boost=\"true\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</title><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><script src=\"/static/htmx-2.0.3.js\"></script><link href=\"/static/stylesheet.css\" rel=\"stylesheet\"></head><body hx-boost=\"true\" class=\"h-screen flex flex-col\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -81,11 +81,15 @@ func layout(title string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"flex-grow\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
 		templ_7745c5c3_Err = templ_7745c5c3_Var2.Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</body></html>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -93,7 +97,7 @@ func layout(title string) templ.Component {
 	})
 }
 
-func Index(reports []repository.ChoreReport) templ.Component {
+func Index(report repository.Report) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -126,15 +130,15 @@ func Index(reports []repository.ChoreReport) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div><canvas id=\"myChart\"></canvas></div><script src=\"/static/chart-4.4.1.js\"></script> ")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"w-full h-full relative\"><canvas id=\"myChart\"></canvas></div><script src=\"/static/chart-4.4.1.js\"></script> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templ.JSONScript("reports", reports).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = templ.JSONScript("report", report).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("   <script>\n\t\t\tvar ctx = document.getElementById('myChart');\n\n\t\t\tnew Chart(ctx, {\n\t\t\t\ttype: 'bar',\n\t\t\t\tdata: {\n\t\t\t\tlabels: ['Mathilde', 'Matthieu'],\n\t\t\t\tdatasets: [\n\t\t\t\t\t{\n\t\t\t\t\t\tlabel: 'Courses',\n\t\t\t\t\t\tdata: [12, 19],\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\tlabel: 'Vaisselle',\n\t\t\t\t\t\tdata: [5,6],\n\t\t\t\t\t},\n\t\t\t\t]\n\t\t\t\t},\n\t\t\t\toptions: {\n\t\t\t\t\tscales: {\n\t\t\t\t\t\tx: {\n        \t\t\t\t\tstacked: true,\n      \t\t\t\t\t},\n\t\t\t\t\t\ty: {\n\t\t\t\t\t\t\tstacked: true\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t});\n\t\t</script>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" <script>\n\t\tvar createDataSet = (report) => {\n\t\t\tvar datasets = []\n\t\t\tfor (const chore of report.chores) {\n\t\t\t\tvar dataset = {}\n\t\t\t\tdataset[\"label\"] = chore\n\t\t\t\tdataset[\"data\"] = []\n\t\t\t\tfor (const user of report.users) {\n\t\t\t\t\tvar reportData = report.report[chore][user]\n\t\t\t\t\tif (reportData) {\n\t\t\t\t\t\tdataset[\"data\"].push(reportData)\n\t\t\t\t\t} else {\n\t\t\t\t\t\tdataset[\"data\"].push(0)\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t\tdatasets.push(dataset)\n\t\t\t}\n\t\t\treturn datasets\n\t\t}\n\t\t\tvar ctx = document.getElementById('myChart');\n\t\t\tvar data = JSON.parse(document.getElementById('report').textContent);\n\n\t\t\tnew Chart(ctx, {\n\t\t\t\ttype: 'bar',\n\t\t\t\tdata: {\n\t\t\t\tlabels: data.users,\n\t\t\t\tdatasets: createDataSet(data)\n\t\t\t\t},\n\t\t\t\toptions: {\n\t\t\t\t\tmaintainAspectRatio: false,\n\t\t\t\t\tscales: {\n\t\t\t\t\t\tx: {\n        \t\t\t\t\tstacked: true,\n      \t\t\t\t\t},\n\t\t\t\t\t\ty: {\n\t\t\t\t\t\t\tstacked: true,\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\tlayout: {\n            \t\t\tpadding: 20,\n       \t\t \t\t},\n\t\t\t\t\tplugins: {\n\t\t\t\t\t\tlegend: {\n\t\t\t\t\t\t\tdisplay: true,\n\t\t\t\t\t\t\tposition: 'bottom',\n\t\t\t\t\t\t},\n\t\t\t\t\t},\n\t\t\t\t}\n\t\t\t});\n\t\t</script>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

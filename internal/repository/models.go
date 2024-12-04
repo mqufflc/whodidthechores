@@ -26,9 +26,3 @@ type User struct {
 	ID   int32  `json:"id"`
 	Name string `json:"name"`
 }
-
-type ChoreReport struct {
-	User  User  `json:"user"`
-	Chore Chore `json:"chore"`
-	Sum   int64 `json:"sum"`
-}

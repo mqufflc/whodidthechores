@@ -69,12 +69,12 @@ func (h *HTTPServer) notFound(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *HTTPServer) index(w http.ResponseWriter, r *http.Request) {
-	reports, err := h.repository.GetChoresReport(r.Context())
+	report, err := h.repository.GetChoreReport(r.Context())
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	html.Index(reports).Render(r.Context(), w)
+	html.Index(report).Render(r.Context(), w)
 }
 
 func (h *HTTPServer) chores(w http.ResponseWriter, r *http.Request) {

@@ -222,21 +222,40 @@ func (r *Repository) DeleteTask(ctx context.Context, id uuid.UUID) error {
 	return nil
 }
 
-func (r *Repository) GetChoresReport(ctx context.Context) ([]ChoreReport, error) {
+// func (r *Repository) GetUsersReport(ctx context.Context) (map[string][]ChoreReport, error) {
+// 	reports, err := r.q.TasksReport(ctx)
+// 	if err != nil {
+// 		if sqlErr := taskPgError(err); sqlErr != nil {
+// 			return nil, sqlErr
+// 		}
+// 		return nil, err
+// 	}
+// 	choreReports := make([]TaskReport, len(reports))
+// 	for index, report := range reports {
+// 		choreReports[index] = TaskReport{
+// 			User:  User(report.User),
+// 			Chore: Chore(report.Chore),
+// 			Sum:   report.Sum,
+// 		}
+// 	}
+// 	return GenerateUserReport(choreReports), nil
+// }
+
+func (r *Repository) GetChoreReport(ctx context.Context) (Report, error) {
 	reports, err := r.q.TasksReport(ctx)
 	if err != nil {
 		if sqlErr := taskPgError(err); sqlErr != nil {
-			return nil, sqlErr
+			return Report{}, sqlErr
 		}
-		return nil, err
+		return Report{}, err
 	}
-	choreReports := make([]ChoreReport, len(reports))
+	choreReports := make([]TaskReport, len(reports))
 	for index, report := range reports {
-		choreReports[index] = ChoreReport{
+		choreReports[index] = TaskReport{
 			User:  User(report.User),
 			Chore: Chore(report.Chore),
 			Sum:   report.Sum,
 		}
 	}
-	return choreReports, nil
+	return GenerateReport(choreReports), nil
 }
