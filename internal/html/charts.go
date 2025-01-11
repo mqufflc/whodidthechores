@@ -119,7 +119,7 @@ func CreateBarChart(report repository.Report) *charts.Bar {
 			opts.Initialization{AssetsHost: "/static/"},
 		),
 		charts.WithLegendOpts(
-			opts.Legend{Type: "scroll", Show: opts.Bool(true), Bottom: "20"},
+			opts.Legend{Type: "scroll", Show: opts.Bool(true), Bottom: "bottom"},
 		),
 	)
 	bar.SetXAxis(report.Users)

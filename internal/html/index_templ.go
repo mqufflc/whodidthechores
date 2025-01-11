@@ -130,7 +130,7 @@ func Index(chart *charts.Bar) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"h-[600px]\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"mx-auto h-[700px] w-3/4 sm:h-[750px] sm:w-5/6 md:h-[1000px] md:w-11/12\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
