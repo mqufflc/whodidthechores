@@ -13,6 +13,7 @@
 - [ ] Add docker-compose deployment instructions
 - [ ] More Logging
 - [ ] README
+- [ ] Style 404 page
 
 ### In Progress
 - [ ] Display task errors in forms

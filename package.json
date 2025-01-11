@@ -2,8 +2,8 @@
   "name": "whodidthechores",
   "version": "1.0.0",
   "scripts": {
-    "build": "tailwindcss build -o internal/html/css/stylesheet.css --minify",
-    "dev": "tailwindcss build -o internal/html/css/stylesheet.css"
+    "build": "tailwindcss build -o internal/html/static/stylesheet.css --minify",
+    "dev": "tailwindcss build -o internal/html/static/stylesheet.css"
   },
   "keywords": [],
   "author": "",

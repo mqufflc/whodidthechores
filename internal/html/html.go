@@ -2,5 +2,5 @@ package html
 
 import "embed"
 
-//go:embed css/stylesheet.css
-var EmbedCSS embed.FS
+//go:embed static
+var EmbedStatic embed.FS
