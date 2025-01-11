@@ -69,7 +69,12 @@ func (h *HTTPServer) notFound(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *HTTPServer) index(w http.ResponseWriter, r *http.Request) {
-	report, err := h.repository.GetChoreReport(r.Context())
+	now := time.Now()
+	currentYear, currentMonth, _ := now.Date()
+
+	firstOfMonth := time.Date(currentYear, currentMonth, 1, 0, 0, 0, 0, h.timezone)
+	lastOfMonth := firstOfMonth.AddDate(0, 1, -1)
+	report, err := h.repository.GetChoreReport(r.Context(), firstOfMonth, lastOfMonth)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

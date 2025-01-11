@@ -47,4 +47,5 @@ SELECT sqlc.embed(users), sqlc.embed(chores), SUM(duration_mn)
 FROM tasks
 JOIN chores ON tasks.chore_id = chores.id
 JOIN users ON tasks.user_id = users.id
+WHERE tasks.started_at > sqlc.arg(not_before) AND tasks.started_at < sqlc.arg(not_after)
 GROUP BY chores.id, users.id;

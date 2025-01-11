@@ -4,6 +4,9 @@ import (
 	"context"
 	"slices"
 	"strings"
+	"time"
+
+	"github.com/mqufflc/whodidthechores/internal/repository/postgres"
 )
 
 type TaskReport struct {
@@ -69,8 +72,8 @@ func GenerateReport(tasks []TaskReport) Report {
 	}
 }
 
-func (r *Repository) GetChoreReport(ctx context.Context) (Report, error) {
-	reports, err := r.q.TasksReport(ctx)
+func (r *Repository) GetChoreReport(ctx context.Context, start time.Time, end time.Time) (Report, error) {
+	reports, err := r.q.TasksReport(ctx, postgres.TasksReportParams{NotBefore: start, NotAfter: end})
 	if err != nil {
 		if sqlErr := taskPgError(err); sqlErr != nil {
 			return Report{}, sqlErr
