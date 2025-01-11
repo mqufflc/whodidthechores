@@ -25,7 +25,7 @@ var chartTpl = `
 	});
 </script>
 <style>
-    .container {padding-top: 30px;display: flex;justify-content: center;align-items: center; height: 100%; width: 100%;}
+    .container {padding-bottom: 30px;display: flex;justify-content: center;align-items: center; height: 100%; width: 100%;}
     .item {margin: auto;}
 </style>
 {{ end }}
@@ -117,7 +117,11 @@ func CreateBarChart(report repository.Report) *charts.Bar {
 	bar.SetGlobalOptions(
 		charts.WithInitializationOpts(
 			opts.Initialization{AssetsHost: "/static/"},
-		))
+		),
+		charts.WithLegendOpts(
+			opts.Legend{Type: "scroll", Show: opts.Bool(true), Bottom: "20"},
+		),
+	)
 	bar.SetXAxis(report.Users)
 	for _, chore := range report.Chores {
 		bar.AddSeries(chore, generateBarItems(chore, report))
