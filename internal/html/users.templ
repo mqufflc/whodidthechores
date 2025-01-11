@@ -7,8 +7,8 @@ import (
 )
 
 templ usersTemplate(users []postgres.User) {
-	<div id="usersList">
-		<table class="table table-sm table-zebra lg:table-lg">
+	<div id="usersList" class="max-h-[38rem] overflow-auto">
+		<table class="table table-pin-rows table-sm table-zebra lg:table-lg">
 			<thead>
 				<tr>
 					<th>Name</th>

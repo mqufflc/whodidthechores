@@ -31,7 +31,7 @@ func navTemplate() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<nav class=\"navbar bg-base-100\"><div class=\"navbar-start\"><div class=\"dropdown\"><div role=\"button\" tabindex=\"0\" class=\"btn btn-ghost lg:hidden\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M4 6h16M4 12h8m-8 6h16\"></path></svg></div><ul tabindex=\"0\" class=\"menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] shadow\"><li><a href=\"/chores\">Chores</a></li><li><a href=\"/users\">Users</a></li><li><a href=\"/tasks\">Tasks</a></li></ul></div><a class=\"btn btn-ghost text-xl\" href=\"/\">Who Did The Chores</a></div><div class=\"navbar-end hidden lg:flex\"><ul class=\"menu menu-horizontal px-1\"><li><a href=\"/chores\">Chores</a></li><li><a href=\"/users\">Users</a></li><li><a href=\"/tasks\">Tasks</a></li></ul></div></nav>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<nav class=\"navbar bg-base-100\"><div class=\"navbar-start\"><div class=\"dropdown\"><div role=\"button\" tabindex=\"0\" class=\"btn btn-ghost lg:hidden\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M4 6h16M4 12h8m-8 6h16\"></path></svg></div><ul tabindex=\"0\" class=\"menu menu-sm dropdown-content bg-base-100 rounded-box z-[30] shadow\"><li><a href=\"/chores\">Chores</a></li><li><a href=\"/users\">Users</a></li><li><a href=\"/tasks\">Tasks</a></li></ul></div><a class=\"btn btn-ghost text-xl\" href=\"/\">Who Did The Chores</a></div><div class=\"navbar-end hidden lg:flex\"><ul class=\"menu menu-horizontal px-1\"><li><a href=\"/chores\">Chores</a></li><li><a href=\"/users\">Users</a></li><li><a href=\"/tasks\">Tasks</a></li></ul></div></nav>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -130,7 +130,7 @@ func Index(chart *charts.Bar) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"mx-auto h-[700px] w-3/4 sm:h-[750px] sm:w-5/6 md:h-[1000px] md:w-11/12\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"mx-auto h-[700px] w-3/4 sm:h-[750px] sm:w-5/6 md:w-11/12\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

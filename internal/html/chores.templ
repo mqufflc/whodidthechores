@@ -8,13 +8,14 @@ import (
 )
 
 templ choresTemplate(chores []postgres.Chore) {
-	<div id="choresList">
-		<table class="table table-sm table-zebra lg:table-lg">
+	<div id="choresList" class="max-h-[38rem] overflow-auto">
+		<table class="table table-pin-rows table-sm table-zebra lg:table-lg">
 			<thead>
 				<tr>
 					<th>Name</th>
 					<th>Description</th>
-					<th>Default Duration</th>
+					<th class="hidden md:inline-block">Default Duration</th>
+					<th></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -22,7 +23,7 @@ templ choresTemplate(chores []postgres.Chore) {
 					<tr id={ fmt.Sprintf("chore-%d", chore.ID) }>
 						<td>{ chore.Name }</td>
 						<td>{ chore.Description }</td>
-						<td>{ strconv.FormatInt(int64(chore.DefaultDurationMn), 10) } mn</td>
+						<td class="hidden md:inline-block">{ strconv.FormatInt(int64(chore.DefaultDurationMn), 10) } mn</td>
 						<td><a class="btn btn-outline btn-accent btn-xs" href={ templ.URL(fmt.Sprintf("/chores/%d", chore.ID)) }>Edit</a></td>
 					</tr>
 				}

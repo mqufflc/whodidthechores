@@ -9,8 +9,8 @@ import (
 )
 
 templ tasksTemplate(tasksRows []postgres.ListUsersTasksRow, timezone *time.Location) {
-	<div id="tasksList">
-		<table class="table table-sm table-zebra lg:table-lg">
+	<div id="tasksList" class="max-h-[38rem] overflow-auto">
+		<table class="table table-pin-rows table-sm table-zebra lg:table-lg">
 			<thead>
 				<tr>
 					<th>Chore</th>
@@ -18,6 +18,7 @@ templ tasksTemplate(tasksRows []postgres.ListUsersTasksRow, timezone *time.Locat
 					<th class="hidden md:inline-block">Duration</th>
 					<th class="hidden md:inline-block">Description</th>
 					<th>Started At</th>
+					<th></th>
 				</tr>
 			</thead>
 			<tbody>
