@@ -204,6 +204,48 @@ func (q *Queries) ListUsersTasks(ctx context.Context) ([]ListUsersTasksRow, erro
 	return items, nil
 }
 
+const tasksReport = `-- name: TasksReport :many
+SELECT users.id, users.name, chores.id, chores.name, chores.description, chores.default_duration_mn, SUM(duration_mn)
+FROM tasks
+JOIN chores ON tasks.chore_id = chores.id
+JOIN users ON tasks.user_id = users.id
+GROUP BY chores.id, users.id
+`
+
+type TasksReportRow struct {
+	User  User
+	Chore Chore
+	Sum   int64
+}
+
+func (q *Queries) TasksReport(ctx context.Context) ([]TasksReportRow, error) {
+	rows, err := q.db.Query(ctx, tasksReport)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []TasksReportRow
+	for rows.Next() {
+		var i TasksReportRow
+		if err := rows.Scan(
+			&i.User.ID,
+			&i.User.Name,
+			&i.Chore.ID,
+			&i.Chore.Name,
+			&i.Chore.Description,
+			&i.Chore.DefaultDurationMn,
+			&i.Sum,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateTask = `-- name: UpdateTask :one
 UPDATE tasks SET 
 user_id = $2,

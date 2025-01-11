@@ -41,3 +41,10 @@ FROM tasks
 JOIN chores ON tasks.chore_id = chores.id
 JOIN users ON tasks.user_id = users.id
 ORDER BY tasks.started_at;
+
+-- name: TasksReport :many
+SELECT sqlc.embed(users), sqlc.embed(chores), SUM(duration_mn)
+FROM tasks
+JOIN chores ON tasks.chore_id = chores.id
+JOIN users ON tasks.user_id = users.id
+GROUP BY chores.id, users.id;

@@ -19,6 +19,12 @@ commonLabels: {}
 
 ## @section Who Did The Chores Parameters
 
+## Who Did The Chores params
+## @param whoDidTheChores.timezone Who Did The Chores time zone
+##
+whoDidTheChores:
+  timezone: "UTC"
+
 ## Who Did The Chores image
 ## ref: https://hub.docker.com/r/mqufflc/whodidthechores/tags
 ## @param image.registry Who Did The Chores image registry
@@ -30,7 +36,7 @@ commonLabels: {}
 image:
   registry: docker.io
   repository: mqufflc/whodidthechores
-  tag: v0.2.2-amd64
+  tag: v0.2.4-amd64
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
