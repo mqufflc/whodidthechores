@@ -359,7 +359,7 @@ func taskFieldSet(task repository.TaskParams, chores []postgres.Chore, users []p
 				var templ_7745c5c3_Var18 string
 				templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.FormatInt(int64(chore.ID), 10))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/tasks.templ`, Line: 89, Col: 60}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/tasks.templ`, Line: 89, Col: 61}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 				if templ_7745c5c3_Err != nil {
@@ -372,7 +372,7 @@ func taskFieldSet(task repository.TaskParams, chores []postgres.Chore, users []p
 				var templ_7745c5c3_Var19 string
 				templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(chore.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/tasks.templ`, Line: 89, Col: 84}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/tasks.templ`, Line: 89, Col: 85}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 				if templ_7745c5c3_Err != nil {
@@ -390,7 +390,7 @@ func taskFieldSet(task repository.TaskParams, chores []postgres.Chore, users []p
 				var templ_7745c5c3_Var20 string
 				templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.FormatInt(int64(chore.ID), 10))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/tasks.templ`, Line: 91, Col: 60}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/tasks.templ`, Line: 91, Col: 61}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 				if templ_7745c5c3_Err != nil {
@@ -403,7 +403,7 @@ func taskFieldSet(task repository.TaskParams, chores []postgres.Chore, users []p
 				var templ_7745c5c3_Var21 string
 				templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(chore.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/tasks.templ`, Line: 91, Col: 75}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/tasks.templ`, Line: 91, Col: 76}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 				if templ_7745c5c3_Err != nil {
@@ -428,7 +428,7 @@ func taskFieldSet(task repository.TaskParams, chores []postgres.Chore, users []p
 				var templ_7745c5c3_Var22 string
 				templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.FormatInt(int64(user.ID), 10))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/tasks.templ`, Line: 101, Col: 59}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/tasks.templ`, Line: 101, Col: 60}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 				if templ_7745c5c3_Err != nil {
@@ -441,7 +441,7 @@ func taskFieldSet(task repository.TaskParams, chores []postgres.Chore, users []p
 				var templ_7745c5c3_Var23 string
 				templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(user.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/tasks.templ`, Line: 101, Col: 82}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/tasks.templ`, Line: 101, Col: 83}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
 				if templ_7745c5c3_Err != nil {
@@ -459,7 +459,7 @@ func taskFieldSet(task repository.TaskParams, chores []postgres.Chore, users []p
 				var templ_7745c5c3_Var24 string
 				templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.FormatInt(int64(user.ID), 10))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/tasks.templ`, Line: 103, Col: 59}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/tasks.templ`, Line: 103, Col: 60}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
 				if templ_7745c5c3_Err != nil {
@@ -472,7 +472,7 @@ func taskFieldSet(task repository.TaskParams, chores []postgres.Chore, users []p
 				var templ_7745c5c3_Var25 string
 				templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(user.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/tasks.templ`, Line: 103, Col: 73}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/tasks.templ`, Line: 103, Col: 74}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
 				if templ_7745c5c3_Err != nil {

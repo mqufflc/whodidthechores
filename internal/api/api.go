@@ -69,18 +69,41 @@ func (h *HTTPServer) notFound(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *HTTPServer) index(w http.ResponseWriter, r *http.Request) {
+	queries := r.URL.Query()
+	fromQuery := queries.Get("from")
+	toQuery := queries.Get("to")
 	now := time.Now()
 	currentYear, currentMonth, _ := now.Date()
 
 	firstOfMonth := time.Date(currentYear, currentMonth, 1, 0, 0, 0, 0, h.timezone)
-	lastOfMonth := firstOfMonth.AddDate(0, 1, -1)
-	report, err := h.repository.GetChoreReport(r.Context(), firstOfMonth, lastOfMonth)
+	lastOfMonth := firstOfMonth.AddDate(0, 1, -1).Add(23*time.Hour + 59*time.Minute + 59*time.Second)
+	var from, to time.Time
+	var err error
+	if fromQuery != "" {
+		from, err = time.ParseInLocation("2006-01-02T15:04", fromQuery, h.timezone)
+		if err != nil {
+			slog.Warn(fmt.Sprintf("Unable to parse 'from': %s", fromQuery))
+			from = firstOfMonth
+		}
+	} else {
+		from = firstOfMonth
+	}
+	if toQuery != "" {
+		to, err = time.ParseInLocation("2006-01-02T15:04", toQuery, h.timezone)
+		if err != nil {
+			slog.Warn(fmt.Sprintf("Unable to parse 'to': %s", toQuery))
+			to = lastOfMonth
+		}
+	} else {
+		to = lastOfMonth
+	}
+	report, err := h.repository.GetChoreReport(r.Context(), from, to)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 	chart := html.CreateBarChart(report)
-	html.Index(chart).Render(r.Context(), w)
+	html.Index(chart, h.timezone, from, to).Render(r.Context(), w)
 }
 
 func (h *HTTPServer) chores(w http.ResponseWriter, r *http.Request) {
