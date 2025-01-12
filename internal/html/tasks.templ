@@ -2,10 +2,10 @@ package html
 
 import (
 	"fmt"
+	"github.com/mqufflc/whodidthechores/internal/repository"
 	"github.com/mqufflc/whodidthechores/internal/repository/postgres"
 	"strconv"
 	"time"
-	"github.com/mqufflc/whodidthechores/internal/repository"
 )
 
 templ tasksTemplate(tasksRows []postgres.ListUsersTasksRow, timezone *time.Location) {
@@ -81,44 +81,44 @@ templ taskFieldSet(task repository.TaskParams, chores []postgres.Chore, users []
 	<fieldset>
 		<legend class="text-lg">Task Values</legend>
 		<div class="p-2 flex flex-col gap-2">
-		<div class="form-control w-full">
-			<label class="label label-text" for="chore-select">Chore</label>
-			<select class="select select-bordered" name="chore-id" id="chore-select" required>
-				for _, chore := range chores {
-					if task.ChoreID == strconv.FormatInt(int64(chore.ID), 10) {
-						<option value={ strconv.FormatInt(int64(chore.ID), 10) } selected>{ chore.Name }</option>
-					} else {
-						<option value={ strconv.FormatInt(int64(chore.ID), 10) }>{ chore.Name }</option>
+			<div class="form-control w-full">
+				<label class="label label-text" for="chore-select">Chore</label>
+				<select class="select select-bordered" name="chore-id" id="chore-select" required>
+					for _, chore := range chores {
+						if task.ChoreID == strconv.FormatInt(int64(chore.ID), 10) {
+							<option value={ strconv.FormatInt(int64(chore.ID), 10) } selected>{ chore.Name }</option>
+						} else {
+							<option value={ strconv.FormatInt(int64(chore.ID), 10) }>{ chore.Name }</option>
+						}
 					}
-				}
-			</select>
-		</div>
-		<div class="form-control w-full">
-			<label class="label label-text" for="user-select">User</label>
-			<select class="select select-bordered" name="user-id" id="user-select" required>
-				for _, user := range users {
-					if task.UserID == strconv.FormatInt(int64(user.ID), 10) {
-						<option value={ strconv.FormatInt(int64(user.ID), 10) } selected>{ user.Name }</option>
-					} else {
-						<option value={ strconv.FormatInt(int64(user.ID), 10) }>{ user.Name }</option>
+				</select>
+			</div>
+			<div class="form-control w-full">
+				<label class="label label-text" for="user-select">User</label>
+				<select class="select select-bordered" name="user-id" id="user-select" required>
+					for _, user := range users {
+						if task.UserID == strconv.FormatInt(int64(user.ID), 10) {
+							<option value={ strconv.FormatInt(int64(user.ID), 10) } selected>{ user.Name }</option>
+						} else {
+							<option value={ strconv.FormatInt(int64(user.ID), 10) }>{ user.Name }</option>
+						}
 					}
-				}
-			</select>
-		</div>
+				</select>
+			</div>
 			<div class="form-control w-full">
 				<label class="label label-text" for="start-time">Start Time</label>
 				<input class="input input-bordered w-full placeholder-neutral-content/50" name="start-time" id="start-time" type="datetime-local" value={ task.StartedAt } required/>
-				<span class="label label-text-alt text-error">{}</span>
+				<span class="label label-text-alt text-error">{  }</span>
 			</div>
 			<div class="form-control w-full">
 				<label class="label label-text" for="description">Description</label>
 				<input class="input input-bordered w-full placeholder-neutral-content/50" name="description" id="description" type="text" value={ task.Description }/>
-				<span class="label label-text-alt text-error">{}</span>
+				<span class="label label-text-alt text-error">{  }</span>
 			</div>
 			<div class="form-control w-full">
 				<label class="label label-text" for="duration">Duration (mn)</label>
 				<input class="input input-bordered w-full placeholder-neutral-content/50" name="duration" id="duration" type="number" placeholder="15" min="0" value={ task.DurationMn } required/>
-				<span class="label label-text-alt text-error">{}</span>
+				<span class="label label-text-alt text-error">{  }</span>
 			</div>
 		</div>
 	</fieldset>
