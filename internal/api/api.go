@@ -73,29 +73,29 @@ func (h *HTTPServer) index(w http.ResponseWriter, r *http.Request) {
 	fromQuery := queries.Get("from")
 	toQuery := queries.Get("to")
 	now := time.Now()
-	currentYear, currentMonth, _ := now.Date()
+	currentYear, currentMonth, currentDay := now.Date()
 
-	firstOfMonth := time.Date(currentYear, currentMonth, 1, 0, 0, 0, 0, h.timezone)
-	lastOfMonth := firstOfMonth.AddDate(0, 1, -1).Add(23*time.Hour + 59*time.Minute + 59*time.Second)
+	defaultLast := time.Date(currentYear, currentMonth, currentDay, 23, 59, 59, 0, h.timezone)
+	defaultFrom := defaultLast.AddDate(0, 0, -90).Add(-23*time.Hour - 59*time.Minute - 59*time.Second)
 	var from, to time.Time
 	var err error
 	if fromQuery != "" {
 		from, err = time.ParseInLocation("2006-01-02T15:04", fromQuery, h.timezone)
 		if err != nil {
 			slog.Warn(fmt.Sprintf("Unable to parse 'from': %s", fromQuery))
-			from = firstOfMonth
+			from = defaultFrom
 		}
 	} else {
-		from = firstOfMonth
+		from = defaultFrom
 	}
 	if toQuery != "" {
 		to, err = time.ParseInLocation("2006-01-02T15:04", toQuery, h.timezone)
 		if err != nil {
 			slog.Warn(fmt.Sprintf("Unable to parse 'to': %s", toQuery))
-			to = lastOfMonth
+			to = defaultLast
 		}
 	} else {
-		to = lastOfMonth
+		to = defaultLast
 	}
 	report, err := h.repository.GetChoreReport(r.Context(), from, to)
 	if err != nil {
