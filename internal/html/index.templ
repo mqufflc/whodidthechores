@@ -1,6 +1,9 @@
 package html
 
-import "github.com/go-echarts/go-echarts/v2/charts"
+import (
+	"github.com/go-echarts/go-echarts/v2/charts"
+	"time"
+)
 
 templ navTemplate() {
 	<nav class="navbar bg-base-100">
@@ -59,8 +62,19 @@ templ layout(title string) {
 	</html>
 }
 
-templ Index(chart *charts.Bar) {
+templ Index(chart *charts.Bar, timezone *time.Location, from time.Time, to time.Time) {
 	@layout("Who Did The Chores") {
+		<form action="/" method="GET" class="p-2 flex flex-col gap-2 lg:flex-row items-center mx-auto w-fit">
+			<div class="form-control">
+				<label class="label label-text" for="from">From</label>
+				<input class="input input-bordered placeholder-neutral-content/50" name="from" id="from" type="datetime-local" value={ from.In(timezone).Format("2006-01-02T15:04") }/>
+			</div>
+			<div class="form-control">
+				<label class="label label-text" for="to">To</label>
+				<input class="input input-bordered placeholder-neutral-content/50" name="to" id="to" type="datetime-local" value={ to.In(timezone).Format("2006-01-02T15:04") }/>
+			</div>
+			<button class="btn btn-primary btn-sm lg:relative lg:top-4">Apply</button>
+		</form>
 		<div class="mx-auto h-[700px] w-3/4 sm:h-[750px] sm:w-5/6 md:w-11/12">
 			@ConvertChartToTemplComponent(chart)
 		</div>

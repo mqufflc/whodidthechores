@@ -209,8 +209,14 @@ SELECT users.id, users.name, chores.id, chores.name, chores.description, chores.
 FROM tasks
 JOIN chores ON tasks.chore_id = chores.id
 JOIN users ON tasks.user_id = users.id
+WHERE tasks.started_at > $1 AND tasks.started_at < $2
 GROUP BY chores.id, users.id
 `
+
+type TasksReportParams struct {
+	NotBefore time.Time
+	NotAfter  time.Time
+}
 
 type TasksReportRow struct {
 	User  User
@@ -218,8 +224,8 @@ type TasksReportRow struct {
 	Sum   int64
 }
 
-func (q *Queries) TasksReport(ctx context.Context) ([]TasksReportRow, error) {
-	rows, err := q.db.Query(ctx, tasksReport)
+func (q *Queries) TasksReport(ctx context.Context, arg TasksReportParams) ([]TasksReportRow, error) {
+	rows, err := q.db.Query(ctx, tasksReport, arg.NotBefore, arg.NotAfter)
 	if err != nil {
 		return nil, err
 	}
