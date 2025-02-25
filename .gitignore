@@ -26,6 +26,7 @@ node_modules
 tmp
 config.yaml
 internal/html/static/stylesheet.css
+values.yaml
 
 .vscode
 dist/
