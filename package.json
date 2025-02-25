@@ -1,0 +1,16 @@
+{
+  "name": "whodidthechores",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "tailwindcss build -o internal/html/static/stylesheet.css --minify",
+    "dev": "tailwindcss build -o internal/html/static/stylesheet.css"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "daisyui": "^4.12.14",
+    "tailwindcss": "^3.4.14"
+  }
+}

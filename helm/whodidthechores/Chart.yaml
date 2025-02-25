@@ -1,0 +1,15 @@
+apiVersion: v2
+appVersion: "0.2.0"
+description: Helm chart for whodidthechores app.
+home: https://github.com/mqufflc/whodidthechores
+keywords:
+  - chores
+kubeVersion: ">=1.19.0-0"
+maintainers:
+  - name: mqufflc
+    url: https://github.com/mqufflc/whodidthechores
+name: whodidthechores
+type: application
+version: "0.1.0"
+sources:
+  - https://github.com/mqufflc/whodidthechores

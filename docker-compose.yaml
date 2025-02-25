@@ -1,0 +1,26 @@
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: changeme
+      POSTGRES_DB: whodidthechores
+    volumes:
+    - pgdata:/var/lib/postgresql/data
+  whodidthechores:
+    image: mqufflc/whodidthechores:v0.2.9-amd64
+    ports:
+      - 8080:8080
+    environment:
+      WDTC_DATABASE_USERNAME: postgres
+      WDTC_DATABASE_PASSWORD: changeme
+      WDTC_DATABASE_HOSTNAME: db
+      WDTC_DATABASE_PORT: "5432"
+      WDTC_DATABASE_DATABASE: whodidthechores
+      WDTC_PORT: "8080"
+      WDTC_TIMEZONE: "UTC"
+    depends_on: ["db"]
+
+volumes:
+  pgdata:
+    name: whodidthechores-pgdata

@@ -19,3 +19,14 @@
 
 # Go workspace file
 go.work
+
+node_modules
+
+.docker-compose
+tmp
+config.yaml
+internal/html/static/stylesheet.css
+values.yaml
+
+.vscode
+dist/

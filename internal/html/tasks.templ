@@ -1,0 +1,125 @@
+package html
+
+import (
+	"fmt"
+	"github.com/mqufflc/whodidthechores/internal/repository"
+	"github.com/mqufflc/whodidthechores/internal/repository/postgres"
+	"strconv"
+	"time"
+)
+
+templ tasksTemplate(tasksRows []postgres.ListUsersTasksRow, timezone *time.Location) {
+	<div id="tasksList" class="max-h-[38rem] overflow-auto">
+		<table class="table table-pin-rows table-sm table-zebra lg:table-lg">
+			<thead>
+				<tr>
+					<th>Chore</th>
+					<th>User</th>
+					<th class="hidden md:inline-block">Duration</th>
+					<th class="hidden md:inline-block">Description</th>
+					<th>Started At</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				for _, taskRow := range tasksRows {
+					<tr id={ fmt.Sprintf("task-%v", taskRow.Task.ID.String()) }>
+						<td>{ taskRow.Chore.Name }</td>
+						<td>{ taskRow.User.Name }</td>
+						<td class="hidden md:inline-block">{ strconv.FormatInt(int64(taskRow.Task.DurationMn), 10) } mn</td>
+						<td class="hidden md:inline-block">{ taskRow.Task.Description }</td>
+						<td>{ taskRow.Task.StartedAt.In(timezone).Format("02/01/2006 15:04") }</td>
+						<td><a class="btn btn-outline btn-accent btn-xs" href={ templ.URL(fmt.Sprintf("/tasks/%v", taskRow.Task.ID.String())) }>Edit</a></td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+}
+
+templ Tasks(tasksRows []postgres.ListUsersTasksRow, timezone *time.Location) {
+	@layout("Tasks") {
+		@tasksTemplate(tasksRows, timezone)
+		<div class="flex m-4">
+			<a class="ml-auto btn btn-primary btn-sm lg:btn-md" href="/tasks/new">Add a Task</a>
+		</div>
+	}
+}
+
+templ TaskCreate(task repository.TaskParams, chores []postgres.Chore, users []postgres.User) {
+	@layout("Create a new Task") {
+		<div class="mx-auto w-80 sm:w-96">
+			<form action="/tasks/new" method="post">
+				@taskFieldSet(task, chores, users)
+				<div class="flex m-4">
+					<a class="btn btn-sm lg:btn-md" href="/tasks">Back</a>
+					<button class="ml-auto btn btn-primary btn-sm lg:btn-md">Save</button>
+				</div>
+			</form>
+		</div>
+	}
+}
+
+templ TaskEdit(task repository.TaskParams, chores []postgres.Chore, users []postgres.User) {
+	@layout("Edit a Task") {
+		<div class="mx-auto w-80 sm:w-96">
+			<form action={ templ.URL(fmt.Sprintf("/tasks/%v", task.ID.String())) } method="PUT">
+				@taskFieldSet(task, chores, users)
+				<div class="flex m-4">
+					<a class="btn btn-sm lg:btn-md" href="/tasks">Back</a>
+					<div class="ml-auto flex justify-between gap-4">
+						<button class="ml-auto btn btn-warning btn-sm lg:btn-md" hx-delete={ fmt.Sprintf("/tasks/%v", task.ID.String()) } hx-confirm="Are you sure you want to delete this task?">Delete</button>
+						<button class="ml-auto btn btn-primary btn-sm lg:btn-md">Save</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	}
+}
+
+templ taskFieldSet(task repository.TaskParams, chores []postgres.Chore, users []postgres.User) {
+	<fieldset>
+		<legend class="text-lg">Task Values</legend>
+		<div class="p-2 flex flex-col gap-2">
+			<div class="form-control w-full">
+				<label class="label label-text" for="chore-select">Chore</label>
+				<select class="select select-bordered" name="chore-id" id="chore-select" required>
+					for _, chore := range chores {
+						if task.ChoreID == strconv.FormatInt(int64(chore.ID), 10) {
+							<option value={ strconv.FormatInt(int64(chore.ID), 10) } selected>{ chore.Name }</option>
+						} else {
+							<option value={ strconv.FormatInt(int64(chore.ID), 10) }>{ chore.Name }</option>
+						}
+					}
+				</select>
+			</div>
+			<div class="form-control w-full">
+				<label class="label label-text" for="user-select">User</label>
+				<select class="select select-bordered" name="user-id" id="user-select" required>
+					for _, user := range users {
+						if task.UserID == strconv.FormatInt(int64(user.ID), 10) {
+							<option value={ strconv.FormatInt(int64(user.ID), 10) } selected>{ user.Name }</option>
+						} else {
+							<option value={ strconv.FormatInt(int64(user.ID), 10) }>{ user.Name }</option>
+						}
+					}
+				</select>
+			</div>
+			<div class="form-control w-full">
+				<label class="label label-text" for="start-time">Start Time</label>
+				<input class="input input-bordered w-full placeholder-neutral-content/50" name="start-time" id="start-time" type="datetime-local" value={ task.StartedAt } required/>
+				<span class="label label-text-alt text-error">{  }</span>
+			</div>
+			<div class="form-control w-full">
+				<label class="label label-text" for="description">Description</label>
+				<input class="input input-bordered w-full placeholder-neutral-content/50" name="description" id="description" type="text" value={ task.Description }/>
+				<span class="label label-text-alt text-error">{  }</span>
+			</div>
+			<div class="form-control w-full">
+				<label class="label label-text" for="duration">Duration (mn)</label>
+				<input class="input input-bordered w-full placeholder-neutral-content/50" name="duration" id="duration" type="number" placeholder="15" min="0" value={ task.DurationMn } required/>
+				<span class="label label-text-alt text-error">{  }</span>
+			</div>
+		</div>
+	</fieldset>
+}
