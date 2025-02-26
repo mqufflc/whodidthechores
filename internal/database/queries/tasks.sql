@@ -29,18 +29,26 @@ WHERE id = $1
 RETURNING *;
 
 -- name: GetUserTasks :many
-SELECT sqlc.embed(tasks), sqlc.embed(chores), sqlc.embed(users)
+SELECT sqlc.embed(tasks), sqlc.embed(chores)
 FROM tasks
 JOIN chores ON tasks.chore_id = chores.id
 JOIN users ON tasks.user_id = users.id
-WHERE users.id = $1;
+WHERE users.id = $1
+ORDER BY tasks.started_at DESC;
+
+-- name: GetChoreTasks :many
+SELECT sqlc.embed(tasks), sqlc.embed(users)
+FROM tasks
+JOIN users ON tasks.user_id = users.id
+WHERE tasks.chore_id = $1
+ORDER BY tasks.started_at DESC;
 
 -- name: ListUsersTasks :many
 SELECT sqlc.embed(tasks), sqlc.embed(chores), sqlc.embed(users)
 FROM tasks
 JOIN chores ON tasks.chore_id = chores.id
 JOIN users ON tasks.user_id = users.id
-ORDER BY tasks.started_at;
+ORDER BY tasks.started_at DESC;
 
 -- name: TasksReport :many
 SELECT sqlc.embed(users), sqlc.embed(chores), SUM(duration_mn)

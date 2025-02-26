@@ -59,6 +59,48 @@ func (q *Queries) DeleteTask(ctx context.Context, id uuid.UUID) error {
 	return err
 }
 
+const getChoreTasks = `-- name: GetChoreTasks :many
+SELECT tasks.id, tasks.user_id, tasks.chore_id, tasks.started_at, tasks.duration_mn, tasks.description, users.id, users.name
+FROM tasks
+JOIN users ON tasks.user_id = users.id
+WHERE tasks.chore_id = $1
+ORDER BY tasks.started_at DESC
+`
+
+type GetChoreTasksRow struct {
+	Task Task
+	User User
+}
+
+func (q *Queries) GetChoreTasks(ctx context.Context, choreID int32) ([]GetChoreTasksRow, error) {
+	rows, err := q.db.Query(ctx, getChoreTasks, choreID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetChoreTasksRow
+	for rows.Next() {
+		var i GetChoreTasksRow
+		if err := rows.Scan(
+			&i.Task.ID,
+			&i.Task.UserID,
+			&i.Task.ChoreID,
+			&i.Task.StartedAt,
+			&i.Task.DurationMn,
+			&i.Task.Description,
+			&i.User.ID,
+			&i.User.Name,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getTask = `-- name: GetTask :one
 SELECT id, user_id, chore_id, started_at, duration_mn, description FROM tasks
 WHERE id = $1
@@ -79,17 +121,17 @@ func (q *Queries) GetTask(ctx context.Context, id uuid.UUID) (Task, error) {
 }
 
 const getUserTasks = `-- name: GetUserTasks :many
-SELECT tasks.id, tasks.user_id, tasks.chore_id, tasks.started_at, tasks.duration_mn, tasks.description, chores.id, chores.name, chores.description, chores.default_duration_mn, users.id, users.name
+SELECT tasks.id, tasks.user_id, tasks.chore_id, tasks.started_at, tasks.duration_mn, tasks.description, chores.id, chores.name, chores.description, chores.default_duration_mn
 FROM tasks
 JOIN chores ON tasks.chore_id = chores.id
 JOIN users ON tasks.user_id = users.id
 WHERE users.id = $1
+ORDER BY tasks.started_at DESC
 `
 
 type GetUserTasksRow struct {
 	Task  Task
 	Chore Chore
-	User  User
 }
 
 func (q *Queries) GetUserTasks(ctx context.Context, id int32) ([]GetUserTasksRow, error) {
@@ -112,8 +154,6 @@ func (q *Queries) GetUserTasks(ctx context.Context, id int32) ([]GetUserTasksRow
 			&i.Chore.Name,
 			&i.Chore.Description,
 			&i.Chore.DefaultDurationMn,
-			&i.User.ID,
-			&i.User.Name,
 		); err != nil {
 			return nil, err
 		}
@@ -162,7 +202,7 @@ SELECT tasks.id, tasks.user_id, tasks.chore_id, tasks.started_at, tasks.duration
 FROM tasks
 JOIN chores ON tasks.chore_id = chores.id
 JOIN users ON tasks.user_id = users.id
-ORDER BY tasks.started_at
+ORDER BY tasks.started_at DESC
 `
 
 type ListUsersTasksRow struct {
