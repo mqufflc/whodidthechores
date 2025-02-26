@@ -298,7 +298,7 @@ func TaskEdit(task repository.TaskParams, chores []postgres.Chore, users []postg
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"flex m-4\"><a class=\"btn btn-sm lg:btn-md\" href=\"/tasks\">Back</a><div class=\"ml-auto flex justify-between gap-4\"><button class=\"ml-auto btn btn-warning btn-sm lg:btn-md\" hx-delete=\"")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"flex m-4\"><button type=\"button\" class=\"btn btn-sm lg:btn-md\" onclick=\"history.back()\">Back</button><div class=\"ml-auto flex justify-between gap-4\"><button class=\"ml-auto btn btn-warning btn-sm lg:btn-md\" hx-delete=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
