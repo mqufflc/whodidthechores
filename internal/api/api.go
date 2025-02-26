@@ -32,10 +32,12 @@ func New(repo *repository.Repository, conf config.Config) http.Handler {
 	mux.HandleFunc("/static/{fileName}", serveStatic)
 	mux.HandleFunc("/{$}", s.index)
 	mux.HandleFunc("/chores", s.chores)
-	mux.HandleFunc("/chores/{id}", s.editChore)
+	mux.HandleFunc("/chores/{id}", s.viewChore)
+	mux.HandleFunc("/chores/{id}/edit", s.editChore)
 	mux.HandleFunc("/chores/new", s.createChore)
 	mux.HandleFunc("/users", s.users)
-	mux.HandleFunc("/users/{id}", s.editUser)
+	mux.HandleFunc("/users/{id}", s.viewUser)
+	mux.HandleFunc("/users/{id}/edit", s.editUser)
 	mux.HandleFunc("/users/new", s.createUser)
 	mux.HandleFunc("/tasks", s.tasks)
 	mux.HandleFunc("/tasks/{id}", s.editTask)
@@ -110,6 +112,35 @@ func (h *HTTPServer) chores(w http.ResponseWriter, r *http.Request) {
 	h.viewChores(w, r)
 }
 
+func (h *HTTPServer) viewChore(w http.ResponseWriter, r *http.Request) {
+	choreID, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	chore, err := h.repository.GetChore(r.Context(), int32(choreID))
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		html.NotFound().Render(r.Context(), w)
+		return
+	}
+	if r.Method != "GET" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	choreParams := repository.ChoreParams{
+		ID:                chore.ID,
+		Name:              chore.Name,
+		Description:       chore.Description,
+		DefaultDurationMn: strconv.FormatInt(int64(chore.DefaultDurationMn), 10),
+	}
+	tasks, err := h.repository.GetChoreTasks(r.Context(), chore.ID)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+	html.ChoreView(choreParams, tasks, h.timezone).Render(r.Context(), w)
+}
+
 func (h *HTTPServer) viewChores(w http.ResponseWriter, r *http.Request) {
 	chores, err := h.repository.ListChores(r.Context())
 	if err != nil {
@@ -147,6 +178,10 @@ func (h *HTTPServer) createChore(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/chores", http.StatusSeeOther)
 		return
 	}
+	if r.Method != "GET" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 	html.ChoreCreate(repository.ChoreParams{}).Render(r.Context(), w)
 }
 
@@ -181,6 +216,9 @@ func (h *HTTPServer) editChore(w http.ResponseWriter, r *http.Request) {
 			slog.Error(fmt.Sprintf("unable to edit chore: %v", err))
 			return
 		}
+		w.Header().Add("HX-Location", fmt.Sprintf("/chores/%d", chore.ID))
+		w.WriteHeader(http.StatusNoContent)
+		return
 	}
 	if r.Method == "DELETE" {
 		err = h.repository.DeleteChore(r.Context(), chore.ID)
@@ -204,6 +242,33 @@ func (h *HTTPServer) editChore(w http.ResponseWriter, r *http.Request) {
 
 func (h *HTTPServer) users(w http.ResponseWriter, r *http.Request) {
 	h.viewUsers(w, r)
+}
+
+func (h *HTTPServer) viewUser(w http.ResponseWriter, r *http.Request) {
+	userID, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	user, err := h.repository.GetUser(r.Context(), int32(userID))
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		html.NotFound().Render(r.Context(), w)
+		return
+	}
+	if r.Method != "GET" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	userParams := repository.UserParams{
+		ID:   user.ID,
+		Name: user.Name,
+	}
+	tasks, err := h.repository.GetUserTasks(r.Context(), user.ID)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+	html.UserView(userParams, tasks, h.timezone).Render(r.Context(), w)
 }
 
 func (h *HTTPServer) viewUsers(w http.ResponseWriter, r *http.Request) {
@@ -245,6 +310,10 @@ func (h *HTTPServer) createUser(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/users", http.StatusSeeOther)
 		return
 	}
+	if r.Method != "GET" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 	html.UserCreate(repository.UserParams{}).Render(r.Context(), w)
 }
 
@@ -282,6 +351,9 @@ func (h *HTTPServer) editUser(w http.ResponseWriter, r *http.Request) {
 			slog.Error(fmt.Sprintf("unable to edit user: %v", err))
 			return
 		}
+		w.Header().Add("HX-Location", fmt.Sprintf("/users/%d", user.ID))
+		w.WriteHeader(http.StatusNoContent)
+		return
 	}
 	if r.Method == "DELETE" {
 		err = h.repository.DeleteUser(r.Context(), user.ID)

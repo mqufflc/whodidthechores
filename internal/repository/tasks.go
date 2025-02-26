@@ -200,6 +200,28 @@ func (r *Repository) UpdateTask(ctx context.Context, id uuid.UUID, taskParams po
 	return task, nil
 }
 
+func (r *Repository) GetChoreTasks(ctx context.Context, choreID int32) ([]postgres.GetChoreTasksRow, error) {
+	tasks, err := r.q.GetChoreTasks(ctx, choreID)
+	if err != nil {
+		if sqlErr := taskPgError(err); sqlErr != nil {
+			return nil, sqlErr
+		}
+		return nil, err
+	}
+	return tasks, nil
+}
+
+func (r *Repository) GetUserTasks(ctx context.Context, userID int32) ([]postgres.GetUserTasksRow, error) {
+	tasks, err := r.q.GetUserTasks(ctx, userID)
+	if err != nil {
+		if sqlErr := taskPgError(err); sqlErr != nil {
+			return nil, sqlErr
+		}
+		return nil, err
+	}
+	return tasks, nil
+}
+
 func (r *Repository) ListUsersTasks(ctx context.Context) ([]postgres.ListUsersTasksRow, error) {
 	tasks, err := r.q.ListUsersTasks(ctx)
 	if err != nil {
