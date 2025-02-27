@@ -2,15 +2,16 @@
   "name": "whodidthechores",
   "version": "1.0.0",
   "scripts": {
-    "build": "tailwindcss build -o internal/html/static/stylesheet.css --minify",
-    "dev": "tailwindcss build -o internal/html/static/stylesheet.css"
+    "build": "npx @tailwindcss/cli -i internal/html/css/input.css -o internal/html/static/stylesheet.css --minify",
+    "dev": "npx @tailwindcss/cli -i internal/html/css/input.css -o internal/html/static/stylesheet.css"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "Apache-2.0",
   "description": "",
   "devDependencies": {
-    "daisyui": "^4.12.14",
-    "tailwindcss": "^3.4.14"
+    "@tailwindcss/cli": "^4.0.9",
+    "daisyui": "^5.0.0-beta.9",
+    "tailwindcss": "^4.0.9"
   }
 }

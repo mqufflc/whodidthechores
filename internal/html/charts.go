@@ -25,7 +25,7 @@ var chartTpl = `
 	});
 </script>
 <style>
-    .container {padding-bottom: 30px;display: flex;justify-content: center;align-items: center; height: 100%; width: 100%;}
+    .container {padding-bottom: 30px;display: flex;justify-content: center;align-items: center; height: 100%; width: 100%; margin: auto}
     .item {margin: auto;}
 </style>
 {{ end }}

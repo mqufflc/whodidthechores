@@ -34,7 +34,7 @@ func navTemplate() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<nav class=\"navbar bg-base-100\"><div class=\"navbar-start\"><div class=\"dropdown\"><div role=\"button\" tabindex=\"0\" class=\"btn btn-ghost lg:hidden\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M4 6h16M4 12h8m-8 6h16\"></path></svg></div><ul tabindex=\"0\" class=\"menu menu-sm dropdown-content bg-base-100 rounded-box z-[30] shadow\"><li><a href=\"/chores\">Chores</a></li><li><a href=\"/users\">Users</a></li><li><a href=\"/tasks\">Tasks</a></li></ul></div><a class=\"btn btn-ghost text-xl\" href=\"/\">Who Did The Chores</a></div><div class=\"navbar-end hidden lg:flex\"><ul class=\"menu menu-horizontal px-1\"><li><a href=\"/chores\">Chores</a></li><li><a href=\"/users\">Users</a></li><li><a href=\"/tasks\">Tasks</a></li></ul></div></nav>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<nav class=\"navbar bg-base-100\"><div class=\"navbar-start\"><div class=\"dropdown\"><div role=\"button\" tabindex=\"0\" class=\"btn btn-ghost lg:hidden\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M4 6h16M4 12h8m-8 6h16\"></path></svg></div><ul tabindex=\"0\" class=\"menu menu-sm dropdown-content bg-base-100 rounded-box z-30 shadow-sm\"><li><a href=\"/chores\">Chores</a></li><li><a href=\"/users\">Users</a></li><li><a href=\"/tasks\">Tasks</a></li></ul></div><a class=\"btn btn-ghost text-xl\" href=\"/\">Who Did The Chores</a></div><div class=\"navbar-end hidden lg:flex\"><ul class=\"menu menu-horizontal px-1\"><li><a href=\"/chores\">Chores</a></li><li><a href=\"/users\">Users</a></li><li><a href=\"/tasks\">Tasks</a></li></ul></div></nav>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -84,7 +84,7 @@ func layout(title string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"flex-grow\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"grow\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -133,33 +133,33 @@ func Index(chart *charts.Bar, timezone *time.Location, from time.Time, to time.T
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<form action=\"/\" method=\"GET\" class=\"p-2 flex flex-col gap-2 lg:flex-row items-center mx-auto w-fit\"><div class=\"form-control\"><label class=\"label label-text\" for=\"from\">From</label> <input class=\"input input-bordered placeholder-neutral-content/50\" name=\"from\" id=\"from\" type=\"datetime-local\" value=\"")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<form action=\"/\" method=\"GET\" class=\"p-2 flex flex-col gap-2 lg:flex-row items-center mx-auto w-fit\"><label class=\"input\"><span class=\"label\">From</span> <input name=\"from\" id=\"from\" type=\"datetime-local\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(from.In(timezone).Format("2006-01-02T15:04"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/index.templ`, Line: 70, Col: 167}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/index.templ`, Line: 70, Col: 107}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"></div><div class=\"form-control\"><label class=\"label label-text\" for=\"to\">To</label> <input class=\"input input-bordered placeholder-neutral-content/50\" name=\"to\" id=\"to\" type=\"datetime-local\" value=\"")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"></label> <label class=\"input\"><span class=\"label\" for=\"to\">To</span> <input name=\"to\" id=\"to\" type=\"datetime-local\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(to.In(timezone).Format("2006-01-02T15:04"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/index.templ`, Line: 74, Col: 161}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/index.templ`, Line: 74, Col: 101}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"></div><button class=\"btn btn-primary btn-sm lg:relative lg:top-4\">Apply</button></form><div class=\"mx-auto h-[700px] w-3/4 sm:h-[750px] sm:w-5/6 md:w-11/12\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"></label> <button class=\"btn btn-primary btn-sm\">Apply</button></form><div class=\"mx-auto h-[700px] w-3/4 sm:h-[750px] sm:w-5/6 md:w-11/12\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

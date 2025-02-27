@@ -346,7 +346,7 @@ func taskFieldSet(task repository.TaskParams, chores []postgres.Chore, users []p
 			templ_7745c5c3_Var17 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<fieldset><legend class=\"text-lg\">Task Values</legend><div class=\"p-2 flex flex-col gap-2\"><div class=\"form-control w-full\"><label class=\"label label-text\" for=\"chore-select\">Chore</label> <select class=\"select select-bordered\" name=\"chore-id\" id=\"chore-select\" required>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<fieldset class=\"fieldset\"><legend class=\"fieldset-legend\">Task Values</legend> <label class=\"fieldset-label\" for=\"chore-select\">Chore</label> <select class=\"input w-full\" name=\"chore-id\" id=\"chore-select\" required>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -359,7 +359,7 @@ func taskFieldSet(task repository.TaskParams, chores []postgres.Chore, users []p
 				var templ_7745c5c3_Var18 string
 				templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.FormatInt(int64(chore.ID), 10))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/tasks.templ`, Line: 89, Col: 61}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/tasks.templ`, Line: 87, Col: 59}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 				if templ_7745c5c3_Err != nil {
@@ -372,7 +372,7 @@ func taskFieldSet(task repository.TaskParams, chores []postgres.Chore, users []p
 				var templ_7745c5c3_Var19 string
 				templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(chore.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/tasks.templ`, Line: 89, Col: 85}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/tasks.templ`, Line: 87, Col: 83}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 				if templ_7745c5c3_Err != nil {
@@ -390,7 +390,7 @@ func taskFieldSet(task repository.TaskParams, chores []postgres.Chore, users []p
 				var templ_7745c5c3_Var20 string
 				templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.FormatInt(int64(chore.ID), 10))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/tasks.templ`, Line: 91, Col: 61}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/tasks.templ`, Line: 89, Col: 59}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 				if templ_7745c5c3_Err != nil {
@@ -403,7 +403,7 @@ func taskFieldSet(task repository.TaskParams, chores []postgres.Chore, users []p
 				var templ_7745c5c3_Var21 string
 				templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(chore.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/tasks.templ`, Line: 91, Col: 76}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/tasks.templ`, Line: 89, Col: 74}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 				if templ_7745c5c3_Err != nil {
@@ -415,7 +415,7 @@ func taskFieldSet(task repository.TaskParams, chores []postgres.Chore, users []p
 				}
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</select></div><div class=\"form-control w-full\"><label class=\"label label-text\" for=\"user-select\">User</label> <select class=\"select select-bordered\" name=\"user-id\" id=\"user-select\" required>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</select> <label class=\"fieldset-label\" for=\"user-select\">User</label> <select class=\"input w-full\" name=\"user-id\" id=\"user-select\" required>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -428,7 +428,7 @@ func taskFieldSet(task repository.TaskParams, chores []postgres.Chore, users []p
 				var templ_7745c5c3_Var22 string
 				templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.FormatInt(int64(user.ID), 10))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/tasks.templ`, Line: 101, Col: 60}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/tasks.templ`, Line: 97, Col: 58}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 				if templ_7745c5c3_Err != nil {
@@ -441,7 +441,7 @@ func taskFieldSet(task repository.TaskParams, chores []postgres.Chore, users []p
 				var templ_7745c5c3_Var23 string
 				templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(user.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/tasks.templ`, Line: 101, Col: 83}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/tasks.templ`, Line: 97, Col: 81}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
 				if templ_7745c5c3_Err != nil {
@@ -459,7 +459,7 @@ func taskFieldSet(task repository.TaskParams, chores []postgres.Chore, users []p
 				var templ_7745c5c3_Var24 string
 				templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.FormatInt(int64(user.ID), 10))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/tasks.templ`, Line: 103, Col: 60}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/tasks.templ`, Line: 99, Col: 58}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
 				if templ_7745c5c3_Err != nil {
@@ -472,7 +472,7 @@ func taskFieldSet(task repository.TaskParams, chores []postgres.Chore, users []p
 				var templ_7745c5c3_Var25 string
 				templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(user.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/tasks.templ`, Line: 103, Col: 74}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/tasks.templ`, Line: 99, Col: 72}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
 				if templ_7745c5c3_Err != nil {
@@ -484,46 +484,46 @@ func taskFieldSet(task repository.TaskParams, chores []postgres.Chore, users []p
 				}
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</select></div><div class=\"form-control w-full\"><label class=\"label label-text\" for=\"start-time\">Start Time</label> <input class=\"input input-bordered w-full placeholder-neutral-content/50\" name=\"start-time\" id=\"start-time\" type=\"datetime-local\" value=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</select> <label class=\"fieldset-label\" for=\"start-time\">Start Time</label> <input class=\"input w-full\" name=\"start-time\" id=\"start-time\" type=\"datetime-local\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var26 string
 		templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinStringErrs(task.StartedAt)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/tasks.templ`, Line: 110, Col: 156}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/tasks.templ`, Line: 104, Col: 108}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" required> <span class=\"label label-text-alt text-error\"></span></div><div class=\"form-control w-full\"><label class=\"label label-text\" for=\"description\">Description</label> <input class=\"input input-bordered w-full placeholder-neutral-content/50\" name=\"description\" id=\"description\" type=\"text\" value=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" required> <span class=\"label text-error\"></span> <label class=\"fieldset-label\" for=\"description\">Description</label> <input class=\"input w-full\" name=\"description\" id=\"description\" type=\"text\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var27 string
 		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(task.Description)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/tasks.templ`, Line: 115, Col: 150}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/tasks.templ`, Line: 107, Col: 102}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"> <span class=\"label label-text-alt text-error\"></span></div><div class=\"form-control w-full\"><label class=\"label label-text\" for=\"duration\">Duration (mn)</label> <input class=\"input input-bordered w-full placeholder-neutral-content/50\" name=\"duration\" id=\"duration\" type=\"number\" placeholder=\"15\" min=\"0\" value=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"> <span class=\"label text-error\"></span> <label class=\"fieldset-label\" for=\"duration\">Duration (mn)</label> <input class=\"input w-full\" name=\"duration\" id=\"duration\" type=\"number\" placeholder=\"15\" min=\"0\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var28 string
 		templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinStringErrs(task.DurationMn)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/tasks.templ`, Line: 120, Col: 170}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/tasks.templ`, Line: 110, Col: 122}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" required> <span class=\"label label-text-alt text-error\"></span></div></div></fieldset>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" required> <span class=\"label text-error\"></span></fieldset>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
