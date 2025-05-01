@@ -48,7 +48,7 @@ func run() error {
 		Handler: handler,
 	}
 
-	logger.Info(fmt.Sprintf("Listening on :%d\n", config.Port))
+	logger.Info(fmt.Sprintf("listening on :%d", config.Port))
 	http.ListenAndServe()
 	return nil
 }

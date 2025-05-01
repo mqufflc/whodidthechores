@@ -22,14 +22,14 @@ var embedMigrations embed.FS
 
 type Effector func(str string, logger *slog.Logger) error
 
-func retry(effector Effector, retries int, delay time.Duration, logger *slog.Logger) Effector {
+func retry(effector Effector, retries int, delay time.Duration) Effector {
 	return func(str string, logger *slog.Logger) error {
 		for r := 0; ; r++ {
 			err := effector(str, logger)
 			if err == nil || r >= retries {
 				return err
 			}
-			slog.Warn(fmt.Sprintf("Attempt %d failed; retrying in %v", r+1, delay))
+			logger.Warn(fmt.Sprintf("attempt %d failed; retrying in %v", r+1, delay))
 			<-time.After(delay)
 		}
 	}
@@ -54,7 +54,7 @@ func checkDatabaseConnectiviy(connString string, logger *slog.Logger) error {
 
 func Migrate(connString string, logger *slog.Logger) error {
 	logger.Info("checking database connectivity")
-	r := retry(checkDatabaseConnectiviy, 30, 10*time.Second, logger)
+	r := retry(checkDatabaseConnectiviy, 30, 10*time.Second)
 	err := r(connString, logger)
 	if err != nil {
 		return fmt.Errorf("all attempts to connect to database failed: %w", err)
@@ -87,7 +87,7 @@ func Migrate(connString string, logger *slog.Logger) error {
 	if err := m.Up(); err != nil {
 		switch {
 		case errors.Is(err, migrate.ErrNoChange):
-			logger.Info("No new migration to apply.")
+			logger.Info("no new migration to apply.")
 			return nil
 		default:
 			return err
