@@ -3,6 +3,8 @@ package repository
 import (
 	"context"
 	"log"
+	"log/slog"
+	"os"
 	"testing"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -59,13 +61,15 @@ func TestRepositoryTestSuit(t *testing.T) {
 func (suite *RepositoryTestSuite) SetupSuite() {
 	suite.ctx = context.Background()
 
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+
 	pgContainer, err := CreatePostgesContainer(suite.ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
 	suite.pgContainer = pgContainer
 
-	err = database.Migrate(pgContainer.ConnectionString)
+	err = database.Migrate(pgContainer.ConnectionString, logger)
 	if err != nil {
 		log.Fatalf("unable to apply database migrations: %v", err)
 	}
