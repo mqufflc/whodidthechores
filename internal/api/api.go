@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -21,7 +22,7 @@ type HTTPServer struct {
 	timezone   *time.Location
 }
 
-func New(repo *repository.Repository, conf config.Config) http.Handler {
+func New(ctx context.Context, repo *repository.Repository, conf config.Config, logger *slog.Logger) http.Handler {
 	location, _ := time.LoadLocation(conf.TimeZone) //timezone already validated in config
 	s := &HTTPServer{
 		repository: repo,
@@ -42,7 +43,7 @@ func New(repo *repository.Repository, conf config.Config) http.Handler {
 	mux.HandleFunc("/tasks", s.tasks)
 	mux.HandleFunc("/tasks/{id}", s.editTask)
 	mux.HandleFunc("/tasks/new", s.createTask)
-	return mux
+	return loggingMiddleware(ctx, logger)(mux)
 }
 
 func serveStatic(w http.ResponseWriter, r *http.Request) {

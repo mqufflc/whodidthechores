@@ -11,7 +11,7 @@
   "description": "",
   "devDependencies": {
     "@tailwindcss/cli": "^4.0.9",
-    "daisyui": "^5.0.0-beta.9",
+    "daisyui": "^5.0.28",
     "tailwindcss": "^4.0.9"
   }
 }

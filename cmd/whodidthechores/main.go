@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"os"
 
@@ -31,7 +32,9 @@ func run() error {
 		return fmt.Errorf("config error: %w", err)
 	}
 
-	pool, err := database.Connect(ctx, config.Database)
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+
+	pool, err := database.Connect(ctx, config.Database, logger)
 	if err != nil {
 		return fmt.Errorf("database connect error: %w", err)
 	}
@@ -39,13 +42,13 @@ func run() error {
 
 	repo := repository.New(repository.NewRepositoryParams{DB: pool})
 
-	handler := api.New(repo, config)
+	handler := api.New(ctx, repo, config, logger)
 	http := &http.Server{
 		Addr:    fmt.Sprintf(":%d", config.Port),
 		Handler: handler,
 	}
 
-	fmt.Printf("Listening on :%d\n", config.Port)
+	logger.Info(fmt.Sprintf("Listening on :%d\n", config.Port))
 	http.ListenAndServe()
 	return nil
 }
