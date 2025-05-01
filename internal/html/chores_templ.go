@@ -510,7 +510,7 @@ func choreFieldSet(choreParams repository.ChoreParams, editable bool) templ.Comp
 			templ_7745c5c3_Var26 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<fieldset")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<fieldset class=\"fieldset\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -520,85 +520,85 @@ func choreFieldSet(choreParams repository.ChoreParams, editable bool) templ.Comp
 				return templ_7745c5c3_Err
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("><legend class=\"text-lg\">Chore Values</legend><div class=\"p-2 flex flex-col gap-2\"><div class=\"form-control w-full\"><label class=\"label label-text\" for=\"name\">Name</label> <input class=\"input input-bordered w-full placeholder-neutral-content/50\" name=\"name\" id=\"name\" type=\"text\" placeholder=\"Dishes\" value=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("><legend class=\"fieldset-legend\">Chore Values</legend> <label class=\"fieldset-label\" for=\"name\">Name</label> <input class=\"input w-full\" name=\"name\" id=\"name\" type=\"text\" placeholder=\"Dishes\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var27 string
 		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(choreParams.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/chores.templ`, Line: 122, Col: 157}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/chores.templ`, Line: 122, Col: 109}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" required> <span class=\"label label-text-alt text-error\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" required> <span class=\"label text-error\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var28 string
 		templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinStringErrs(choreParams.Errors.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/chores.templ`, Line: 123, Col: 75}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/chores.templ`, Line: 123, Col: 58}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</span></div><div class=\"form-control w-full\"><label class=\"label label-text\" for=\"description\">Description</label> <input class=\"input input-bordered w-full placeholder-neutral-content/50\" name=\"description\" id=\"description\" type=\"text\" placeholder=\"Washing the dishes\" value=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</span> <label class=\"fieldset-label\" for=\"description\">Description</label> <input class=\"input w-full\" name=\"description\" id=\"description\" type=\"text\" placeholder=\"Washing the dishes\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var29 string
 		templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinStringErrs(choreParams.Description)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/chores.templ`, Line: 127, Col: 190}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/chores.templ`, Line: 125, Col: 142}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"> <span class=\"label label-text-alt text-error\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"> <span class=\"label text-error\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var30 string
 		templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinStringErrs(choreParams.Errors.Description)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/chores.templ`, Line: 128, Col: 82}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/chores.templ`, Line: 126, Col: 65}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var30))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</span></div><div class=\"form-control w-full\"><label class=\"label label-text\" for=\"default_duration\">Default Duration (mn)</label> <input class=\"input input-bordered w-full placeholder-neutral-content/50\" name=\"default_duration\" id=\"default_duration\" type=\"number\" placeholder=\"15\" min=\"0\" value=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</span> <label class=\"fieldset-label\" for=\"default_duration\">Default Duration (mn)</label> <input class=\"input w-full\" name=\"default_duration\" id=\"default_duration\" type=\"number\" placeholder=\"15\" min=\"0\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var31 string
 		templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(choreParams.DefaultDurationMn)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/chores.templ`, Line: 132, Col: 200}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/chores.templ`, Line: 128, Col: 152}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" required> <span class=\"label label-text-alt text-error\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" required> <span class=\"label text-error\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var32 string
 		templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.JoinStringErrs(choreParams.Errors.DefaultDurationMn)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/chores.templ`, Line: 133, Col: 88}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/html/chores.templ`, Line: 129, Col: 71}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var32))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</span></div></div></fieldset>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</span></fieldset>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

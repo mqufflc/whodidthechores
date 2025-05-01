@@ -81,11 +81,11 @@ templ UserCreate(userParams repository.UserParams) {
 templ UserView(userParams repository.UserParams, tasksRow []postgres.GetUserTasksRow, timezone *time.Location) {
 	@layout("Create a new User") {
 		<div class="mx-auto w-80 sm:w-96">
-				@userFieldSet(userParams, false)
-				<div class="flex m-4">
-					<a class="btn btn-sm lg:btn-md" href="/users">Back</a>
-					<a class="ml-auto btn btn-primary btn-sm lg:btn-md" href={ templ.URL(fmt.Sprintf("/users/%d/edit", userParams.ID)) }>Edit</a>
-				</div>
+			@userFieldSet(userParams, false)
+			<div class="flex m-4">
+				<a class="btn btn-sm lg:btn-md" href="/users">Back</a>
+				<a class="ml-auto btn btn-primary btn-sm lg:btn-md" href={ templ.URL(fmt.Sprintf("/users/%d/edit", userParams.ID)) }>Edit</a>
+			</div>
 		</div>
 		@tasksUserTemplate(tasksRow, timezone)
 	}
@@ -109,14 +109,15 @@ templ UserEdit(userParams repository.UserParams) {
 }
 
 templ userFieldSet(userParams repository.UserParams, editable bool) {
-	<fieldset if !editable { disabled }>
-		<legend class="text-lg">User Values</legend>
-		<div class="p-2 flex flex-col gap-2">
-			<div class="form-control w-full">
-				<label class="label label-text" for="name">Name</label>
-				<input class="input input-bordered w-full placeholder-neutral-content/50" name="name" id="name" type="text" value={ userParams.Name } required/>
-				<span class="label label-text-alt text-error">{ userParams.Errors.Name }</span>
-			</div>
-		</div>
+	<fieldset
+		class="fieldset"
+		if !editable {
+			disabled
+		}
+	>
+		<legend class="fieldset-legend">User Values</legend>
+		<label class="fieldset-label" for="name">Name</label>
+		<input class="input w-full" name="name" id="name" type="text" value={ userParams.Name } required/>
+		<span class="label text-error">{ userParams.Errors.Name }</span>
 	</fieldset>
 }
