@@ -138,6 +138,8 @@ func (h *HTTPServer) viewChore(w http.ResponseWriter, r *http.Request) {
 	tasks, err := h.repository.GetChoreTasks(r.Context(), chore.ID)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		slog.Error(fmt.Sprintf("unable to get chore tasks: %v", err))
+		return
 	}
 	html.ChoreView(choreParams, tasks, h.timezone).Render(r.Context(), w)
 }
@@ -268,6 +270,8 @@ func (h *HTTPServer) viewUser(w http.ResponseWriter, r *http.Request) {
 	tasks, err := h.repository.GetUserTasks(r.Context(), user.ID)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		slog.Error(fmt.Sprintf("unable to get user tasks: %v", err))
+		return
 	}
 	html.UserView(userParams, tasks, h.timezone).Render(r.Context(), w)
 }
@@ -382,6 +386,8 @@ func (h *HTTPServer) viewTasks(w http.ResponseWriter, r *http.Request) {
 	tasks, err := h.repository.ListUsersTasks(r.Context())
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		slog.Error(fmt.Sprintf("unable to list users tasks: %v", err))
+		return
 	}
 	html.Tasks(tasks, h.timezone).Render(r.Context(), w)
 }
@@ -423,7 +429,11 @@ func (h *HTTPServer) createTask(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		h.repository.CreateTask(r.Context(), taskParamsValidated)
+		if _, err := h.repository.CreateTask(r.Context(), taskParamsValidated); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			slog.Error(fmt.Sprintf("unable to create task: %v", err))
+			return
+		}
 		http.Redirect(w, r, "/tasks", http.StatusSeeOther)
 		return
 	}

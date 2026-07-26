@@ -49,6 +49,8 @@ func run() error {
 	}
 
 	logger.Info(fmt.Sprintf("listening on :%d", config.Port))
-	http.ListenAndServe()
+	if err := http.ListenAndServe(); err != nil {
+		return fmt.Errorf("server error: %w", err)
+	}
 	return nil
 }

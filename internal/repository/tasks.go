@@ -110,12 +110,9 @@ func (r *Repository) ValidateTaskChoreId(ctx context.Context, choreId int) error
 	if choreId > 2147483647 {
 		return ErrNotFound
 	}
-	chore, err := r.GetChore(ctx, int32(choreId))
+	_, err := r.GetChore(ctx, int32(choreId))
 	if err != nil {
 		return fmt.Errorf("unable to get existing chore: %w", err)
-	}
-	if chore == (postgres.Chore{}) {
-		return ErrNotFound
 	}
 	return nil
 }
@@ -127,12 +124,9 @@ func (r *Repository) ValidateTaskUserId(ctx context.Context, userId int) error {
 	if userId > 2147483647 {
 		return ErrNotFound
 	}
-	user, err := r.GetUser(ctx, int32(userId))
+	_, err := r.GetUser(ctx, int32(userId))
 	if err != nil {
 		return fmt.Errorf("unable to get existing user: %w", err)
-	}
-	if user == (postgres.User{}) {
-		return ErrNotFound
 	}
 	return nil
 }

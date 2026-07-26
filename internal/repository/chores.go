@@ -7,11 +7,15 @@ import (
 	"log/slog"
 	"strconv"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/mqufflc/whodidthechores/internal/repository/postgres"
 )
 
 func chorePgError(err error) error {
+	if errors.Is(err, pgx.ErrNoRows) {
+		return ErrNotFound
+	}
 	var pgErr *pgconn.PgError
 	if !errors.As(err, &pgErr) {
 		return nil
