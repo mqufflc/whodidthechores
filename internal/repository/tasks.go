@@ -53,6 +53,7 @@ func (r *Repository) ValidateTask(ctx context.Context, taskParams *TaskParams, t
 		isErr = true
 		taskParams.Errors.ChoreID = "Please select an existing chore"
 	} else if err = r.ValidateTaskChoreId(ctx, choreId); err != nil {
+		isErr = true
 		switch {
 		case errors.Is(err, ErrNotFound):
 			taskParams.Errors.ChoreID = "Chore not found"
@@ -66,6 +67,7 @@ func (r *Repository) ValidateTask(ctx context.Context, taskParams *TaskParams, t
 		isErr = true
 		taskParams.Errors.UserID = "Please select an existing user"
 	} else if err = r.ValidateTaskUserId(ctx, userId); err != nil {
+		isErr = true
 		switch {
 		case errors.Is(err, ErrNotFound):
 			taskParams.Errors.UserID = "User not found"
@@ -79,6 +81,7 @@ func (r *Repository) ValidateTask(ctx context.Context, taskParams *TaskParams, t
 		isErr = true
 		taskParams.Errors.DurationMn = "Please enter a number"
 	} else if err = r.ValidateTaskDuration(duration); err != nil {
+		isErr = true
 		switch {
 		case errors.Is(err, ErrTooSmall):
 			taskParams.Errors.DurationMn = "Duration can't be negative"

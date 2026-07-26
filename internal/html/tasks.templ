@@ -90,6 +90,7 @@ templ taskFieldSet(task repository.TaskParams, chores []postgres.Chore, users []
 				}
 			}
 		</select>
+		<span class="label text-error">{ task.Errors.ChoreID }</span>
 		<label class="fieldset-label" for="user-select">User</label>
 		<select class="input w-full" name="user-id" id="user-select" required>
 			for _, user := range users {
@@ -100,14 +101,15 @@ templ taskFieldSet(task repository.TaskParams, chores []postgres.Chore, users []
 				}
 			}
 		</select>
+		<span class="label text-error">{ task.Errors.UserID }</span>
 		<label class="fieldset-label" for="start-time">Start Time</label>
 		<input class="input w-full" name="start-time" id="start-time" type="datetime-local" value={ task.StartedAt } required/>
-		<span class="label text-error">{  }</span>
+		<span class="label text-error">{ task.Errors.StartedAt }</span>
 		<label class="fieldset-label" for="description">Description</label>
 		<input class="input w-full" name="description" id="description" type="text" value={ task.Description }/>
-		<span class="label text-error">{  }</span>
+		<span class="label text-error">{ task.Errors.Description }</span>
 		<label class="fieldset-label" for="duration">Duration (mn)</label>
 		<input class="input w-full" name="duration" id="duration" type="number" placeholder="15" min="0" value={ task.DurationMn } required/>
-		<span class="label text-error">{  }</span>
+		<span class="label text-error">{ task.Errors.DurationMn }</span>
 	</fieldset>
 }
