@@ -42,15 +42,13 @@ var baseTpl = `
 <script type="text/javascript">
     "use strict";
 
-	let goecharts_{{ .ChartID | safeJS }} = echarts.init(document.getElementById('{{ .ChartID | safeJS }}'), "{{ .Theme }}", { renderer: "{{  .Initialization.Renderer }}" });
-	let option_{{ .ChartID | safeJS }} = {{ template "base_option" . }}
+	window.goecharts_{{ .ChartID | safeJS }} = echarts.init(document.getElementById('{{ .ChartID | safeJS }}'), "{{ .Theme }}", { renderer: "{{  .Initialization.Renderer }}" });
+	window.option_{{ .ChartID | safeJS }} = {{ template "base_option" . }}
 	goecharts_{{ .ChartID | safeJS }}.setOption(option_{{ .ChartID | safeJS }});
 
-	document.addEventListener("DOMContentLoaded", () => {
-		setTimeout(function () {
-			goecharts_{{ .ChartID | safeJS }}.resize()
-		}, 100)
-	});
+	setTimeout(function () {
+		goecharts_{{ .ChartID | safeJS }}.resize()
+	}, 100);
 
   {{- range  $listener := .EventListeners }}
     {{if .Query  }}

@@ -159,7 +159,7 @@ func Index(chart *charts.Bar, timezone *time.Location, from time.Time, to time.T
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\"></label> <button class=\"btn btn-primary btn-sm\">Apply</button></form><div class=\"mx-auto h-[700px] w-3/4 sm:h-[750px] sm:w-5/6 md:w-11/12\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\"></label> <button class=\"btn btn-primary btn-sm\">Apply</button></form><div class=\"mx-auto h-[700px] w-3/4 sm:h-[750px] sm:w-5/6 md:w-11/12\" hx-history=\"false\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
